@@ -21,7 +21,6 @@ public class Parser{
           if(numModels % 50 == 0){
             System.out.println("Another 50 completed\n");
           }
-          //int modelNum = Integer.parseInt(time.substring(0,2))
           String modelName = String.format("MODEL %s", numModels);
           currModel = new Model(modelName);
           numModels++;

@@ -27,10 +27,6 @@ public class Model{
   ////getAtomsList();
   ////getAlphaCarbons();
   ////size();
-  ////lrmsd(Model m1);
-  ////centroids(Model m1);
-  ////realign(Model m1);
-  ////euclideanDistance(m1); *Array of atoms*
   ////toString();
   ////////////////////////////////////////
   public void addAtom(Atom a){
@@ -57,20 +53,6 @@ public class Model{
     
   public int size(){
     return atomsList.size();
-  }
-  
-  ////lrmsd(Model m1);
-  ////centroids(Model m1);
-  ////realign(Model m1);
-  ////euclideanDistance(m1); *Array of atoms*
-  double euclideanDistance(Model m1){
-    double distance = 0.0;
-    Atom[] mCA = this.getAlphaCarbons();
-    Atom[] m1CA = m1.getAlphaCarbons();
-    for(int i=0; i < this.getAlphaCarbons().length; i++){
-      distance = distance + mCA[i].getCoords().euclideanDistance(m1CA[i].getCoords());
-    }
-    return distance;
   }
   
   @Override

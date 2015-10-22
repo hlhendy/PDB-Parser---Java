@@ -40,26 +40,22 @@ public class Coords{
     return z;
   }
   
+  public double lrmsd(Coords c1){
+    return 0.0;
+  }
+  
   public double euclideanDistance(Coords c1){
-    return Math.sqrt(this.distanceSquared(c1));
+    return 0.0;
   }
   public double manhattanDistance(Coords c1){
-    double deltaX = this.x - c1.getX();
-    double deltaY = this.y - c1.getY();
-    double deltaZ = this.z - c1.getZ();
-    double result = Math.abs(deltaX) + Math.abs(deltaY) + Math.abs(deltaZ);
-    return result;
+    return 0.0;
   }
   public double distanceSquared(Coords c1){
-    double deltaX = this.x - c1.getX();
-    double deltaY = this.y - c1.getY();
-    double deltaZ = this.z - c1.getZ();
-    double result = (deltaX*deltaX + deltaY*deltaY + deltaZ*deltaZ);
-    return result;
+    return 0.0;
   }
   
   @Override
   public String toString(){
-    return String.format("[%f, %f, %f]\n", x, y, z);
+    return String.format("[%d, %d, %d]\n", x, y, z);
   }
 }
