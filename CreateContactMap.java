@@ -15,7 +15,10 @@ public class CreateContactMap{
       structure = Parser.PDB(args[0]);
     }
     System.out.println("Structure Created Successfully\n" + structure.toString());
-    System.out.println("Typical CA count: " + structure.getModel(0).getAlphaCarbons().length);
+    System.out.println("CA count: " + structure.getModel(0).getAlphaCarbons().length);
+//    for(int i=0; i<structure.getModel(0).getAlphaCarbons().length; i++){
+//      System.out.println(structure.getModel(0).getAlphaCarbons()[i]);
+//    }
 
     /////////////////CONTACT MAPS/////////////////////////
     //Binary

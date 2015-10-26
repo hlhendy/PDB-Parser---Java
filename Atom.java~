@@ -21,7 +21,6 @@ public class Atom{
   //METHODS///////////////////////////////            
   ////getName();
   ////getCoords();
-  ////setCoords();
   ////toString();
   ////////////////////////////////////////
   public String getName(){
@@ -30,15 +29,6 @@ public class Atom{
   
   public Coords getCoords(){
     return coordinates;
-  }
-  
-  public void setCoords(Coords c){
-    this.coordinates = c;
-  }
-  
-  public void setCoords(double x, double y, double z){
-    Coords c = new Coords(x,y,z);
-    this.coordinates = c;
   }
   
   @Override

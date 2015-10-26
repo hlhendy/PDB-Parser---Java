@@ -28,8 +28,8 @@ public class Model{
   ////getAlphaCarbons();
   ////size();
   ////lrmsd(Model m1);
-  ////centroids(Model m1);
-  ////realign(Model m1);
+  ////centroids();
+  ////realign();
   ////euclideanDistance(m1); *Array of atoms*
   ////toString();
   ////////////////////////////////////////
@@ -60,10 +60,47 @@ public class Model{
   }
   
   ////lrmsd(Model m1);
-  ////centroids(Model m1);
-  ////realign(Model m1);
+  public double lrmsd(Model m1){
+    Atom[] conf1_prime = this.realign();
+    Atom[] conf2_prime = m1.realign();
+    
+    //calculate optimal rotation
+    return 0.0;
+  }
+  
+  ////centroids(); **Just Alpha Carbons**
+  public Coords centroid(){
+    double[] center = {0,0,0};
+    double length = this.getAlphaCarbons().length;
+    for(int i=0; i < length; i++){
+      center[0] += this.getAlphaCarbons()[i].getCoords().getX();
+      center[1] += this.getAlphaCarbons()[i].getCoords().getY();
+      center[2] += this.getAlphaCarbons()[i].getCoords().getZ();
+    }
+    for(int j=0; j<3; j++){
+      center[j] /= length;
+    }
+    return new Coords(center[0], center[1], center[2]);
+  }
+  ////realign();
+  //Get each Atom's coords, subtract centroid, update coords
+  public Atom[] realign (){
+    double avgX = this.centroid().getX();
+    double avgY = this.centroid().getY();
+    double avgZ = this.centroid().getZ();
+    Atom[] caRealigned = this.getAlphaCarbons();
+    for(int i=0; i<caRealigned.length; i++){
+      double x = caRealigned[i].getCoords().getX();
+      double y = caRealigned[i].getCoords().getY();
+      double z = caRealigned[i].getCoords().getZ();
+      
+      caRealigned[i].setCoords((x-avgX), (y-avgY), (z-avgZ));
+    }
+    return caRealigned;
+  }
+  
   ////euclideanDistance(m1); *Array of atoms*
-  double euclideanDistance(Model m1){
+  public double euclideanDistance(Model m1){
     double distance = 0.0;
     Atom[] mCA = this.getAlphaCarbons();
     Atom[] m1CA = m1.getAlphaCarbons();
