@@ -18,8 +18,8 @@ public class Parser{
         //if token is MODEL - create new model and add to structure
         if(next.equals("MODEL") && lineScanner.hasNext()){
           //read name and create model
-          if(numModels % 50 == 0){
-            System.out.println("Another 50 completed\n");
+          if(numModels % 1000 == 0){
+            System.out.printf("%d models completed\n", numModels);
           }
           //int modelNum = Integer.parseInt(time.substring(0,2))
           String modelName = String.format("MODEL %s", numModels);
@@ -37,7 +37,7 @@ public class Parser{
           Double x = Double.parseDouble(lineScanner.next());
           Double y = Double.parseDouble(lineScanner.next());
           Double z = Double.parseDouble(lineScanner.next());
-          currAtom = new Atom(atomName, new Coords(x, y, z));
+          currAtom = new Atom(atomName, x, y, z);
           currModel.addAtom(currAtom);
         }
         //if token is TER - end model

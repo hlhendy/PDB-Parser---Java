@@ -1,21 +1,23 @@
 public class Atom{
   String name;
-  Coords coordinates;
+  double[] coords;
   
   //CONSTRUCTORS
   public Atom(){
     this.name = new String();
-    this.coordinates = new Coords();
+    coords = new double[3];
   }
   
   public Atom(String name){
+    this();
     this.name = name;
-    this.coordinates = new Coords();
   }
 
-  public Atom(String name, Coords c){
-    this.name = name;
-    this.coordinates = c;
+  public Atom(String name, double x, double y, double z){
+    this(name);
+    coords[0] = x;
+    coords[1] = y;
+    coords[2] = z;
   }
   
   //METHODS///////////////////////////////            
@@ -28,21 +30,18 @@ public class Atom{
     return name;
   }
   
-  public Coords getCoords(){
-    return coordinates;
-  }
-  
-  public void setCoords(Coords c){
-    this.coordinates = c;
+  public double[] getCoords(){
+    return coords;
   }
   
   public void setCoords(double x, double y, double z){
-    Coords c = new Coords(x,y,z);
-    this.coordinates = c;
+    coords[0] = x;
+    coords[1] = y;
+    coords[2] = z;
   }
   
   @Override
   public String toString(){
-    return String.format("%s: %s\n", name, coordinates.toString());
+    return String.format("%s: %s\n", name, coords.toString());
   }
 }
