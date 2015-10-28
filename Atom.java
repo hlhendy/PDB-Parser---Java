@@ -42,6 +42,8 @@ public class Atom{
   
   @Override
   public String toString(){
-    return String.format("%s: %s\n", name, coords.toString());
+    StringBuilder c = new StringBuilder("");
+    c.append(String.format("[%.2f, %.2f, %.2f]", coords[0], coords[1], coords[2]));
+    return(String.format("%s : %s\n", name, c.toString()));
   }
 }

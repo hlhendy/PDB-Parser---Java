@@ -2,19 +2,23 @@ import java.util.ArrayList;
 
 public class Model{
   String name;
+  double lRMSD;
   ArrayList<Atom> atomsList;
   
   //CONSTRUCTORS
   public Model(){
     this.name = new String();
+    this.lRMSD = 0.0;
     this.atomsList = new ArrayList<Atom>();
   }
   public Model(String name){
     this.name = name;
+    this.lRMSD = 0.0;
     this.atomsList = new ArrayList<Atom>();
   }
-  public Model(String name, Atom[] atomsList){
+  public Model(String name, double lRMSD, Atom[] atomsList){
     this.name = name;
+    this.lRMSD = lRMSD;
     this.atomsList = new ArrayList<Atom>();
     for(int i=0; i<atomsList.length; i++){
       this.atomsList.add(atomsList[i]);
@@ -35,6 +39,14 @@ public class Model{
   
   public String getName(){
     return name;
+  }
+  
+  public void setlRMSD(double lRMSD){
+    this.lRMSD = lRMSD;
+  }
+  
+  public double getlRMSD(){
+    return lRMSD;
   }
   
   public ArrayList<Atom> getAtomsList(){
