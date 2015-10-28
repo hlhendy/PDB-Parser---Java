@@ -4,7 +4,6 @@ import java.io.*;
 public class CreateContactMap{
   
   public static void main(String[] args) throws IOException{
-    PrintWriter writer = new PrintWriter(new File("ContactMaps.txt"));
     int RES_DISTANCE = 4;
     int BIN_CRITERIA = 8; //A
     Structure structure = new Structure();
@@ -15,6 +14,9 @@ public class CreateContactMap{
     }else{
       structure = Parser.PDB(args[0]);
     }
+    String output = String.format("%s_ContactMaps.txt", structure.getName());
+    System.out.println(output);
+    PrintWriter writer = new PrintWriter(new File(output));
     if(structure.getModelsList().size() >0){
       System.out.println("Structure Created Successfully\n" + structure.toString());
       writer.println("CA count: " + structure.getModel(0).getAlphaCarbons().length);
@@ -25,8 +27,9 @@ public class CreateContactMap{
       System.out.println("Warning: PROGRAM STOPPING - NO MODELS CREATED!");
       return;
     }
-
+    
     /////////////////CONTACT MAPS/////////////////////////
+    //FOR EACH MODEL:
     //Binary
     //// 1: Euclidean distance between CA atoms is <= 8A
     //// 0: Distance is > 8A
@@ -34,36 +37,39 @@ public class CreateContactMap{
     ////Stores actual CA-CA distances
     /////////////////////////////////////////////////////
     System.out.println("Now creating contact maps\n");
-    //create vectors
-    int numCA = structure.getModel(0).getAlphaCarbons().length;
     ArrayList<Model> models = structure.getModelsList();
-    double[][] realValueMap = new double[numCA][numCA];
-    int[][] binMap = new int[numCA][numCA];
-    try{
-      for(int i=0; i < (numCA-RES_DISTANCE); i++){
-        for(int j=i+RES_DISTANCE; j < numCA; j++){
-          realValueMap[i][j] = Distance.euclideanDistance(models.get(i), models.get(j));
-          if(realValueMap[i][j] > 8){
-            binMap[i][j] = 0;
-          }else{
-            binMap[i][j] = 1;
+    //MODELS (i)
+    for(int i=0; i<models.size(); i++){
+      //create vectors
+      Atom[] alpha_carbons = models.get(i).getAlphaCarbons();
+      double[][] realValueMap = new double[alpha_carbons.length][alpha_carbons.length];
+      int[][] binMap = new int[alpha_carbons.length][alpha_carbons.length];
+      try{
+        //ALPHA CARBONS (j and k)
+        for(int j=0; j < (alpha_carbons.length-RES_DISTANCE); j++){
+          for(int k=j+RES_DISTANCE; k < alpha_carbons.length; k++){
+            realValueMap[j][k] = Distance.euclideanDistance(alpha_carbons[j], alpha_carbons[k]);
+            if(realValueMap[j][k] > 8){
+              binMap[j][k] = 0;
+            }else{
+              binMap[j][k] = 1;
+            }
           }
         }
       }
-    }
-    catch(Exception e){
-      System.out.print("WARNING! There was an error creating the contact map.\n");
-    }
-    
-    //PRINT MAPS -- CHANGE TO WRITE TO FILE
-    StringBuilder string = new StringBuilder("");
-    for(int i=0; i<realValueMap.length; i++){
-      for(int j=0; j<realValueMap[0].length; j++){
-          string.append(String.format("%.2f ", realValueMap[i][j]));
+      catch(Exception e){
+        System.out.print("WARNING! There was an error creating the contact map.\n");
       }
-      string.append("\n");
+      //PRINT MAPS TO FILE
+      writer.println(String.format("REAL VALUE MAP %d", (i+1)));
+      for(int m=0; m<realValueMap.length; m++){
+        for(int n=0; n<realValueMap[0].length; n++){
+          writer.print(String.format("%.2f ", realValueMap[m][n]));
+        }
+        writer.println("");
+      }
     }
-    writer.print(string);
     writer.close();
+    System.out.println("Contact Maps Created.");
   }
 }

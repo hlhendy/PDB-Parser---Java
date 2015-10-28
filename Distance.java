@@ -1,12 +1,14 @@
+import java.lang.Math;
 //NEED TO RECONFIGURE//
 public class Distance{
   //METHODS///////////////////////////////
-  ////euclideanDistance(Coords c1);
+  ////euclideanDistance(Atom a1, Atom a2);
   ////manhattanDistance(Coords c1);
   ////distanceSquared(Coords c1);
+  ////lrmsd();
   ////////////////////////////////////////
-  public static double euclideanDistance(double[] c1, double[] c2){
-    return Math.sqrt(distanceSquared(c1, c2));
+  public static double euclideanDistance(Atom a1, Atom a2){
+    return Math.sqrt(distanceSquared(a1, a2));
   }
   
   public static double manhattanDistance(double[] c1, double[] c2){
@@ -16,7 +18,9 @@ public class Distance{
     double result = Math.abs(deltaX) + Math.abs(deltaY) + Math.abs(deltaZ);
     return result;
   }
-  public static double distanceSquared(double[] c1, double[] c2){
+  public static double distanceSquared(Atom a1, Atom a2){
+    double[] c1 = a1.getCoords();
+    double[] c2 = a2.getCoords();
     double deltaX = c1[0] - c2[0];
     double deltaY = c1[1] - c2[1];
     double deltaZ = c1[2] - c2[2];
@@ -60,17 +64,5 @@ public class Distance{
       caRealigned[i].setCoords((x-avgX), (y-avgY), (z-avgZ));
     }
     return caRealigned;
-  }
-  
-  ////euclideanDistance(m1); *Array of atoms*
-  public static double euclideanDistance(Model m1, Model m2){
-    double distance = 0.0;
-    Atom[] m1CA = m1.getAlphaCarbons();
-    Atom[] m2CA = m2.getAlphaCarbons();
-    for(int i=0; i < m1.getAlphaCarbons().length; i++){
-      distance = distance + Distance.euclideanDistance(m1CA[i].getCoords(), m2CA[i].getCoords());
-    }
-    return distance;
-  }
-  
+  } 
 }

@@ -6,6 +6,7 @@ public class Parser{
   public static Structure PDB(String filename){
     Model currModel = new Model();
     Atom currAtom = new Atom();
+    boolean inModel = false;
     Structure currStructure = new Structure(filename);
     int numModels = 0;
     try{
@@ -16,7 +17,7 @@ public class Parser{
       while(lineScanner.hasNext()){
         String next = lineScanner.next();
         //if token is MODEL - create new model and add to structure
-        if(next.equals("MODEL") && lineScanner.hasNext()){
+        if((next.equals("MODEL") || (next.equals("ATOM") && !inModel) && lineScanner.hasNext())){
           //read name and create model
           if(numModels % 1000 == 0){
             System.out.printf("%d models completed\n", numModels);
@@ -25,9 +26,10 @@ public class Parser{
           String modelName = String.format("MODEL %s", numModels);
           currModel = new Model(modelName);
           numModels++;
+          inModel = true;
         }
-        //if token is ATOM - create new atom in current model
-        if(next.equals("ATOM")){
+        //if token is ATOM and a model has been started - create new atom in current model
+        if(next.equals("ATOM") && inModel){
           lineScanner.next();
           String atomName = lineScanner.next();
           //skip unwanted info
@@ -47,6 +49,7 @@ public class Parser{
         //if token is END - end model 
         if(next.equals("END")){
           currStructure.addModel(currModel);
+          inModel = false;
         }
         //if token is ENDMDL - end model
 //               if(next.equals("ENDMDL"){
@@ -58,7 +61,7 @@ public class Parser{
     sc.close();
     }
     catch(FileNotFoundException e){
-     System.out.print("Please enter a valide file name.");
+     System.out.print("Please enter a valid file name.");
      return new Structure();
     }
     return currStructure;
