@@ -29,6 +29,7 @@ public class Model{
   ////addAtom(Atom a);             
   ////getName();
   ////getAtomsList();
+  //getAtomNames();
   ////getAlphaCarbons();
   ////size();
   ////toString();
@@ -51,6 +52,13 @@ public class Model{
   
   public ArrayList<Atom> getAtomsList(){
     return atomsList;
+  }
+  
+  public char[] getAtomNames(){
+    char[] atomNames = new char[atomsList.size()];
+    for(int i=0; i<atomsList.size(); i++){
+      atomNames = atomsList.get(i).getName();
+    }
   }
   
   public Atom[] getAlphaCarbons(){
