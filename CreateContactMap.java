@@ -4,22 +4,35 @@ import java.io.*;
 public class CreateContactMap{
   
   public static void main(String[] args) throws IOException{
+    //TODO: make these part of args
     int RES_DISTANCE = 4; //Atoms apart
     int BIN_CRITERIA = 8; //Angstroms
     int LRMSD_CRITERIA = 2; //Angstroms
     Structure structure = new Structure();
     Structure nativeStructure = new Structure();
+    ArrayList<Double> lrmsds = new ArrayList<Double>();
     
     //PARSE FILES
     //check to see if filenames are valid
-    if(args.length != 2 || args[0] == null || args[1] == null){
-      System.out.println("Please enter valid filenames: <conformations>.pdb <native>.pdb");
+    //TODO: add check to see if list is provided as second arg
+    if(args.length < 2 || args.length > 3 || args[0] == null || args[1] == null){
+      System.out.println("Please enter valid filenames: <conformations>.pdb <native>.pdb <optional rmsd list>.rmsd");
       return;
-    }else{
+    }
+    if(args.length >= 2){
       nativeStructure = Parser.PDB(args[1]);
       structure = Parser.PDB(args[0]);
     }
-    if(structure.getModelsList().size() >0){
+    if(args.length == 3){
+      if(args[2] != null){
+        lrmsds = Parser.rmsdFile(args[2]);
+      }else{
+        System.out.println("Please enter a valid filename for the rmsd list.");
+        return;
+      }
+      
+    }
+    if((structure.getModelsList().size() >0) && (nativeStructure.getModelsList().size() > 0)){
       System.out.println("Structure Created Successfully\n" + structure.toString());
       System.out.println("Native Structure Created Successfully\n" + nativeStructure.toString());
     }else{
@@ -30,29 +43,34 @@ public class CreateContactMap{
     //////////////////////////////////////////////////////////
     //     CALCULATE lRMSD AND SORT BY LRMSD_CRITERIA       //
     //////////////////////////////////////////////////////////
-    //Check to see if both models have same number of atoms -- need to output list of positions from lcs
-    if(currModel.size() != nativeModel.size()){
-        Model[] longestCommonSeq = lcs(currModel, nativeModel);
-        currModel = longestCommonSeq[0];
-        nativeModel = longestCommonSeq[1];
-      }
+    //IF no lrmads given, check to see if both models have same number of atoms
+    //need to output list of positions from lcs
+    if(lrmsds == null){
+      //compute lrmsds, nativeStructure is first structure
+      lrmsds = Distance.lrmsd(nativeStructure, structure);
+    }
     ArrayList<Model> withinlRMSD = new ArrayList<Model>();
     ArrayList<Model> morethanlRMSD = new ArrayList<Model>();
-    ArrayList<Model> modelsList = structure.getModelsList();
-    Model nativeModel = nativeStructure.getModelsList().get(0);
-    for(int i=0; i <modelsList.size(); i++){
-      Model currModel = modelsList.get(i);
-      //then set the current model in the list to that rmsd value using currModel instead
-      modelsList.get(i).setlRMSD(Distance.lrmsd(currModel, nativeModel));
-      if(modelsList.get(i).getlRMSD() > LRMSD_CRITERIA){
-        //sort into morethan list
-        morethanlRMSD.add(modelsList.get(i));
+    //////////////////////////////////////////////////////////////////////////////////
+    //TODO: once lrmsds calc capability updated, update this to require matching sizes
+    if(lrmsds.size() != structure.size()){
+      ArrayList<Double> lrmsdsShort = new ArrayList<Double>();
+      for(int i=0; i<structure.size(); i++){
+        lrmsdsShort.add(lrmsds.get(i));
+      }
+      lrmsds = lrmsdsShort;
+    }
+    ///////////////////////////////////////////////////////////////////////////////////
+    System.out.println("Sorting by lrmsd criteria.\n");
+    for(int i=0; i<lrmsds.size(); i++){
+      if(lrmsds.get(i) > LRMSD_CRITERIA){
+        morethanlRMSD.add(structure.getModel(i));
       }else{
-        //sort into within list
-        withinlRMSD.add(modelsList.get(i));
+        withinlRMSD.add(structure.getModel(i));
       }
     }
-    
+    System.out.printf("Lists Sorted\n Models within lrmsd criteria: %d\n Models more than lrmsd criteria: %d\n", 
+                      withinlRMSD.size(), morethanlRMSD.size());
     /////////////////CONTACT MAPS/////////////////////////
     //FOR EACH MODEL IN EACH SORTED LIST (AL withinlRMSD/ AL morethanlRMSD):
     //Binary
@@ -61,93 +79,106 @@ public class CreateContactMap{
     //Real-Valued
     ////Stores actual CA-CA distances
     /////////////////////////////////////////////////////
-    System.out.println("Now creating Contact Maps.\n");
+    System.out.println("Now creating Contact Maps for each list.\n");
     //String output = String.format("%s_ContactMaps.txt", structure.getName());
     //PrintWriter writer = new PrintWriter(new File(output));
-    ContactMap[] within_realValueMaps = new ContactMap[structure.size()];
-    ContactMap[] within_binaryMaps =  new ContactMap[structure.size()];
-    ContactMap[] morethan_realValueMaps = new ContactMap[structure.size()];
-    ContactMap[] morethan_binaryMaps =  new ContactMap[structure.size()];
+    int numCAs = withinlRMSD.get(0).getAlphaCarbons().length;
+    double[][] within_realValueMaps = new double[withinlRMSD.size()][numCAs];
+    int[][] within_binaryMaps =  new int[withinlRMSD.size()][numCAs];
+    double[][] morethan_realValueMaps = new double[morethanlRMSD.size()][numCAs];
+    int[][] morethan_binaryMaps =  new int[morethanlRMSD.size()][numCAs];
     ////////////////////////////////////////////////
     //
     //             WITHIN lRMSD CRITERIA
     //
     ////////////////////////////////////////////////
+    System.out.println("Creating maps for within-lrmsd criteria list\n");
     for(int i=0; i<withinlRMSD.size(); i++){
       //create atom vectors for current model
       Atom[] ca_within = withinlRMSD.get(i).getAlphaCarbons();
       //DO NOT NEED TO BE MATRICES -- PUT IN WEKA FORMAT -- vectors
-      double[][] within_realValueMap = new double[ca_within.length][ca_within.length];
-      int[][] within_binMap = new int[ca_within.length][ca_within.length];
+      double[] within_realValueMap = new double[ca_within.length];
+      int[] within_binMap = new int[ca_within.length];
       try{
         //CALC DISTANCES FOR ALPHA CARBONS (within(k) AND ADD TO MAPS
         //for each alpha carbon
+        int numContacts = 0;
         for(int k=0; k<(ca_within.length-RES_DISTANCE); k++){
           //for each alpha carbon 4 away from current alpha carbon (within(n) and morethan(p))
           for(int n=k+RES_DISTANCE; n<ca_within.length; n++){
-            within_realValueMap[k][n] = Distance.euclideanDistance(ca_within[k], ca_within[n]);
-//            writer.printf(" %s  |  %s  |  %.2f  \n", 
-//                                       alpha_carbons[j].toString(), alpha_carbons[k].toString(), realValueMap[j][k]);
+            within_realValueMap[numContacts] = Distance.euclideanDistance(ca_within[k], ca_within[n]);
             //add to binary maps
-            if(within_realValueMap[k][n] > BIN_CRITERIA){
-              within_binMap[k][n] = 0;
+            if(within_realValueMap[numContacts] > BIN_CRITERIA){
+              within_binMap[numContacts] = 0;
             }else{
-              within_binMap[k][n] = 1;
+              within_binMap[numContacts] = 1;
             }
           }
+          numContacts++;
         }
       }
       catch(Exception e){
-        System.out.print("WARNING! There was an error creating the contact map.\n");
+        System.out.printf("WARNING! There was an error creating contact map %d.\n", i);
+        return;
       }
       //ADD MAP TO LISTS OF MAPS
-      ContactMap within_Temp = new ContactMap(String.format("Model %d", i), within_realValueMap, ca_within);
-      
-      //PRINT MAPS TO FILE -- CHANGE TO USE ContactMaps's toString()
-//      writer.println(String.format("REAL VALUE MAP %d", (i+1)));
-//      for(int m=0; m<realValueMap.length; m++){
-//        for(int n=0; n<realValueMap[0].length; n++){
-//          writer.print(String.format("%.2f ", realValueMap[m][n]));
-//        }
-//        writer.println("");
-//      }
+      within_realValueMaps[i] = within_realValueMap;
+      within_binaryMaps[i] = within_binMap;
     }
-  //////////////////////////////////////////////////////////////
-  //
-  //             MORE THAN lRMSD_CRITERIA
-  //
-  //////////////////////////////////////////////////////////////
-  for(int j=0; j<morethanlRMSD.size(); j++){
+//  //////////////////////////////////////////////////////////////
+//  //
+//  //             MORE THAN lRMSD_CRITERIA
+//  //
+//  //////////////////////////////////////////////////////////////
+    System.out.println("Creating maps for morethan-lrmsd criteria list\n");
+    for(int i=0; i<morethanlRMSD.size(); i++){
       //create atom vectors for current model
-      Atom[] ca_morethan = morethanlRMSD.get(j).getAlphaCarbons();
+      Atom[] ca_morethan = morethanlRMSD.get(i).getAlphaCarbons();
       //DO NOT NEED TO BE MATRICES -- PUT IN WEKA FORMAT -- vectors
-      double[][] morethan_realValueMap = new double[ca_morethan.length][ca_morethan.length];
-      int[][] morethan_binMap = new int[ca_morethan.length][ca_morethan.length];
+      double[] morethan_realValueMap = new double[ca_morethan.length];
+      int[] morethan_binMap = new int[ca_morethan.length];
       try{
-        //CALC DISTANCES FOR ALPHA CARBONS morethan(m) AND ADD TO MAPS
+        //CALC DISTANCES FOR ALPHA CARBONS (within(k) AND ADD TO MAPS
         //for each alpha carbon
-        for(int m=0; m<(ca_morethan.length-RES_DISTANCE); m++){
+        int numContacts = 0;
+        for(int k=0; k<(ca_morethan.length-RES_DISTANCE); k++){
           //for each alpha carbon 4 away from current alpha carbon (within(n) and morethan(p))
-          for(int p=m+RES_DISTANCE; p<ca_morethan.length; p++){
-            morethan_realValueMap[m][p] = Distance.euclideanDistance(ca_morethan[m], ca_morethan[p]);
-//            writer.printf(" %s  |  %s  |  %.2f  \n", 
-//                                       alpha_carbons[j].toString(), alpha_carbons[k].toString(), realValueMap[j][k]);
-            //add to binary maps
-            if(morethan_realValueMap[m][p] > BIN_CRITERIA){
-              morethan_binMap[m][p] = 0;
+          for(int n=k+RES_DISTANCE; n<ca_morethan.length; n++){
+            morethan_realValueMap[numContacts] = Distance.euclideanDistance(ca_morethan[k], ca_morethan[n]);
+            //add to binary map
+            if(morethan_realValueMap[numContacts] > BIN_CRITERIA){
+              morethan_binMap[numContacts] = 0;
             }else{
-              morethan_binMap[m][p] = 1;
+              morethan_binMap[numContacts] = 1;
             }
           }
+          numContacts++;
         }
       }
       catch(Exception e){
-        System.out.print("WARNING! There was an error creating the contact map.\n");
+        System.out.printf("WARNING! There was an error creating contact map %d.\n", i);
+        return;
       }
       //ADD MAP TO LISTS OF MAPS
-      ContactMap morethan_Temp = new ContactMap(String.format("Model %d", j), morethan_realValueMap, ca_morethan);
+      morethan_realValueMaps[i] = morethan_realValueMap;
+      morethan_binaryMaps[i] = morethan_binMap;
     }
-    //writer.close();
     System.out.println("Contact Maps Created.");
+    
+    //print sample maps to file for review/check
+    System.out.println("Printing sample maps for models within criteria to file.");
+    PrintWriter writer = new PrintWriter(new File("../Data/within_RV_sample.txt"));
+    writer.append(withinlRMSD.get(0).toString() + "\r\n");
+    for(int i=0; i<within_realValueMaps[0].length; i++){
+      writer.append(within_realValueMaps[0][i] + "\r\n");
+    }
+    writer.flush();
+    System.out.println("Printing sample maps for models more than criteria to file.");
+    writer = new PrintWriter(new File("../Data/morethan_RV_sample.txt"));
+    writer.append(morethanlRMSD.get(0).toString() + "\r\n");
+    for(int i=0; i<morethan_realValueMaps[0].length; i++){
+      writer.append(morethan_realValueMaps[0][i] + "\r\n");
+    }
+    writer.close();
   }
 }

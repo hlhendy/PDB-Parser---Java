@@ -19,7 +19,7 @@ public class Parser{
         //if token is MODEL - create new model and add to structure
         if((next.equals("MODEL") || (next.equals("ATOM") && !inModel) && lineScanner.hasNext())){
           //read name and create model
-          if(numModels % 1000 == 0){
+          if(numModels % 100 == 0){
             System.out.printf("%d models completed\n", numModels);
           }
           //int modelNum = Integer.parseInt(time.substring(0,2))
@@ -66,4 +66,22 @@ public class Parser{
     }
     return currStructure;
   }
+  //rmsd file parser -- must  be list of doubles
+  public static ArrayList<Double> rmsdFile(String filename){
+    ArrayList<Double> rmsd = new ArrayList<Double>();
+    try{
+      Scanner sc = new Scanner(new File(filename));
+      double next = 0.0;
+      while(sc.hasNextDouble()){
+        next = sc.nextDouble();
+        rmsd.add(next);
+      } 
+    }
+    catch(FileNotFoundException e){
+      System.out.print("Please enter a valid file name.");
+      return new ArrayList<Double>();
+    }
+    return rmsd;
+  }
+  
 }

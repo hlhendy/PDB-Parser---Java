@@ -6,7 +6,9 @@ public class Distance{
   ////euclideanDistance(Atom a1, Atom a2);
   ////manhattanDistance(Coords c1);
   ////distanceSquared(Coords c1);
-  ////lrmsd();
+  ////lcs(); *longest common sequence
+  ////lrmsd(Model1, Model2);
+  ////lrmsd(Structure n[ative], Structure confs);
   ////////////////////////////////////////
   public static double euclideanDistance(Atom a1, Atom a2){
     return Math.sqrt(distanceSquared(a1, a2));
@@ -42,47 +44,47 @@ public class Distance{
      return distance/a1.size();
   }
    
-   public static Model[] lcs(Model m1, Model m2){
+   //public static Model[] lcs(Model m1, Model m2){
      //find longest common sequence
       //must also store direction - which one of the cases
       //in the recursive formulation gave you the LCS
       //CODE FROM AMARDA
      //create charater arrays of atom names
-     Model[] reducedModels = new Model[2];
-     char[] x = m1.getAtomNames();
-     char[] y = m2.getAtomNames();
-     //create matrix C of m+1 rows and n+1 cols, where
-     //m is the number of chars in sequence x and n in sequence y
-     char[][] C = new char[x.length+1][y.length+1];
-      if(x[i] == y[j]){
-        C[i, j] = C[i-1, j-1] + 1;
-        direction[i,j] = 1; //diagonal
-      }else{
-        C[i,j] = max{ C[i-1, j], C[i, j-1] }
-        if(C[i,j] = C[i-1, j]){
-          direction[j,j] = 0; //up
-        }else{ 
-          direction[i.j] = -1; //down
-          i = m;
-          j = n;
-        }
-      while(i > 0 && j > 0){
-        if(direction[i,j] == 1){
-          LCS[C[i,j]] = x[i];
-          positionfromxforcomparison = i;
-          positionfromyforcomparison = j;
-           }
-         else if(direction[i,j] == 0){
-          LCS[C[i,j]] = x[i]
-         }
-         else{
-          LCS[C[i,j]] = y[j]   //check if this is x[i] and above y[j], in a hurry
-         }
-      }
-    }
+//     Model[] reducedModels = new Model[2];
+//     char[] x = m1.getAtomNames();
+//     char[] y = m2.getAtomNames();
+//     //create matrix C of m+1 rows and n+1 cols, where
+//     //m is the number of chars in sequence x and n in sequence y
+//     char[][] C = new char[x.length+1][y.length+1];
+//      if(x[i] == y[j]){
+//        C[i, j] = C[i-1, j-1] + 1;
+//        direction[i,j] = 1; //diagonal
+//      }else{
+//        C[i,j] = max{ C[i-1, j], C[i, j-1] }
+//        if(C[i,j] = C[i-1, j]){
+//          direction[j,j] = 0; //up
+//        }else{ 
+//          direction[i.j] = -1; //down
+//          i = m;
+//          j = n;
+//        }
+//      while(i > 0 && j > 0){
+//        if(direction[i,j] == 1){
+//          LCS[C[i,j]] = x[i];
+//          positionfromxforcomparison = i;
+//          positionfromyforcomparison = j;
+//           }
+//         else if(direction[i,j] == 0){
+//          LCS[C[i,j]] = x[i]
+//         }
+//         else{
+//          LCS[C[i,j]] = y[j]   //check if this is x[i] and above y[j], in a hurry
+//         }
+//      }
+    //}
       //return new Models with updated atoms lists, according to lcs
-      return reducedModels;
-   }
+      //return reducedModels;
+   //}
   
   ////lrmsd(Model m1);
   public static double lrmsd(Model m1, Model m2){
@@ -97,6 +99,21 @@ public class Distance{
     //sqrt(abs(distance with rotation)/n)
     lrmsd = Math.sqrt(Math.abs(distanceSquared(m1, m2)/m1.size()));
     return lrmsd;
+  }
+  
+  ////lrmsd(Structure n[ative], confs);
+  public static ArrayList<Double> lrmsd(Structure n, Structure confs){
+    if(n.getModel(0).size() != confs.getModel(0).size()){
+        //compute list of positions for lcs then use to compute lrmsd
+      }
+    Model nativeModel = n.getModel(0);
+    double currLRMSD = 0.0;
+    ArrayList<Double> allRMSDs = new ArrayList<Double>();
+    for(int i=0; i<confs.size(); i++){
+      currLRMSD = lrmsd(nativeModel, confs.getModel(i));
+      allRMSDs.add(currLRMSD);
+    }
+    return allRMSDs;
   }
   
   ////centroids(); **Just Alpha Carbons**
