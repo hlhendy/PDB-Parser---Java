@@ -97,8 +97,8 @@ public class CreateContactMap{
       //create atom vectors for current model
       Atom[] ca_within = withinlRMSD.get(i).getAlphaCarbons();
       //DO NOT NEED TO BE MATRICES -- PUT IN WEKA FORMAT -- vectors
-      double[] within_realValueMap = new double[ca_within.length];
-      int[] within_binMap = new int[ca_within.length];
+      double[] within_realValueMap = new double[ca_within.length-RES_DISTANCE];
+      int[] within_binMap = new int[ca_within.length-RES_DISTANCE];
       try{
         //CALC DISTANCES FOR ALPHA CARBONS (within(k) AND ADD TO MAPS
         //for each alpha carbon
@@ -135,8 +135,8 @@ public class CreateContactMap{
       //create atom vectors for current model
       Atom[] ca_morethan = morethanlRMSD.get(i).getAlphaCarbons();
       //DO NOT NEED TO BE MATRICES -- PUT IN WEKA FORMAT -- vectors
-      double[] morethan_realValueMap = new double[ca_morethan.length];
-      int[] morethan_binMap = new int[ca_morethan.length];
+      double[] morethan_realValueMap = new double[ca_morethan.length-RES_DISTANCE];
+      int[] morethan_binMap = new int[ca_morethan.length-RES_DISTANCE];
       try{
         //CALC DISTANCES FOR ALPHA CARBONS (within(k) AND ADD TO MAPS
         //for each alpha carbon
@@ -180,5 +180,16 @@ public class CreateContactMap{
       writer.append(morethan_realValueMaps[0][i] + "\r\n");
     }
     writer.close();
+    
+    //Need to put data into arff format for weka
+    //http://www.cs.waikato.ac.nz/ml/weka/arff.html
+    //General example: (not arff format)
+    //        Atom1-Atom5 Atom5-Atom9 .... AtomN-AtomN+4 label
+    // model0 distance    distance         distance      label
+    //
+    //so loop through each list of models and label accordingly
+    //while looping, output all of the contact map info
+    //for(models in withinlrmsd)
+    //  print contact map info, then either 0 (morethan) or 1 (within)
   }
 }

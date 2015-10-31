@@ -19,10 +19,7 @@ public class Parser{
         //if token is MODEL - create new model and add to structure
         if((next.equals("MODEL") || (next.equals("ATOM") && !inModel) && lineScanner.hasNext())){
           //read name and create model
-          if(numModels % 100 == 0){
-            System.out.printf("%d models completed\n", numModels);
-          }
-          //int modelNum = Integer.parseInt(time.substring(0,2))
+          //int modelNum = Integer.parseInt(line.substring(5,6));
           String modelName = String.format("MODEL %s", numModels);
           currModel = new Model(modelName);
           numModels++;
@@ -50,6 +47,9 @@ public class Parser{
         if(next.equals("END")){
           currStructure.addModel(currModel);
           inModel = false;
+          if(currStructure.size() % 100 == 0){
+            System.out.printf("%d models completed\n", currStructure.size());
+          }
         }
         //if token is ENDMDL - end model
 //               if(next.equals("ENDMDL"){
