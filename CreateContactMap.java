@@ -11,6 +11,7 @@ public class CreateContactMap{
     Structure structure = new Structure();
     Structure nativeStructure = new Structure();
     ArrayList<Double> lrmsds = new ArrayList<Double>();
+    //Atom[] atomSequence;
     
     //PARSE FILES
     //check to see if filenames are valid
@@ -43,9 +44,12 @@ public class CreateContactMap{
     //////////////////////////////////////////////////////////
     //     CALCULATE lRMSD AND SORT BY LRMSD_CRITERIA       //
     //////////////////////////////////////////////////////////
-    //IF no lrmads given, check to see if both models have same number of atoms
+    //If no lrmads given, check to see if both models have same number of atoms
     //need to output list of positions from lcs
     if(lrmsds == null){
+      if(nativeStructure.getModel(0).size() != structure.getModel(0).size()){
+        
+      }
       //compute lrmsds, nativeStructure is first structure
       lrmsds = Distance.lrmsd(nativeStructure, structure);
     }
@@ -179,7 +183,7 @@ public class CreateContactMap{
     for(int i=0; i<morethan_realValueMaps[0].length; i++){
       writer.append(morethan_realValueMaps[0][i] + "\r\n");
     }
-    writer.close();
+    writer.flush();
     
     //Need to put data into arff format for weka
     //http://www.cs.waikato.ac.nz/ml/weka/arff.html
@@ -191,5 +195,55 @@ public class CreateContactMap{
     //while looping, output all of the contact map info
     //for(models in withinlrmsd)
     //  print contact map info, then either 0 (morethan) or 1 (within)
+    System.out.println("Creating arff files for Weka.");
+    String filename = "ContactMapFeatures.arff";
+    String directory = "../Data/";
+    File file = new File(directory, filename);
+    writer = new PrintWriter(file);
+    //Comments
+    writer.append("% 1. Title: Contact Map Features\n%\n%\n");
+    //Header: Relation and Attributes
+    writer.append("@RELATION protein-conformations\n");
+    writer.append("\n");
+    //Attributes: each atom-atom pair
+    //for each atom pair:
+    ////@ATTRIBUTE atomname-atomname NUMERIC
+    ////...
+    ////@ATTRIBUTE label NUMERIC
+    for(int i=0; i<within_realValueMaps[0].length; i++){
+      writer.append(String.format("@ATTRIBUTE pair%d NUMERIC\n", i));
+    }
+    writer.append("@ATTRIBUTE class NUMERIC\n");
+    writer.append("\n");
+    //Data
+    //@DATA
+    //for each conformation
+    ////5.1,3.5,...,10.5,0 -------->each distance from contact map, then 0 or 1 for label
+    
+    writer.append("@DATA\n");
+    for(int i=0; i<within_realValueMaps.length; i++){
+      StringBuilder sb = new StringBuilder();
+      //each value in current map separated by a comma
+      for(int j=0; j<within_realValueMaps[i].length; j++){
+        sb.append(within_realValueMaps[i][j]);
+        sb.append(",");
+      }
+      //append label at end of current contact map data
+      sb.append("1\n");
+      writer.append(sb.toString());
+    }
+    for(int i=0; i<morethan_realValueMaps.length; i++){
+      StringBuilder sb = new StringBuilder();
+      //each value in current map separated by a comma
+      for(int j=0; j<morethan_realValueMaps[i].length; j++){
+        sb.append(morethan_realValueMaps[i][j]);
+        sb.append(",");
+      }
+      //append label at end of current contact map data
+      sb.append("0\n");
+      writer.append(sb.toString());
+    }
+    System.out.printf("File Created in directory %s\n", directory);
+    writer.close();
   }
 }
