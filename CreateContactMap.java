@@ -48,7 +48,7 @@ public class CreateContactMap{
     //need to output list of positions from lcs
     if(lrmsds == null){
       if(nativeStructure.getModel(0).size() != structure.getModel(0).size()){
-        
+        //find longest common sequence with direction
       }
       //compute lrmsds, nativeStructure is first structure
       lrmsds = Distance.lrmsd(nativeStructure, structure);
@@ -91,6 +91,8 @@ public class CreateContactMap{
     int[][] within_binaryMaps =  new int[withinlRMSD.size()][numCAs];
     double[][] morethan_realValueMaps = new double[morethanlRMSD.size()][numCAs];
     int[][] morethan_binaryMaps =  new int[morethanlRMSD.size()][numCAs];
+    AtomPair[] morethan_atomPairs = new AtomPair[numCAs-RES_DISTANCE];
+    AtomPair[] within_atomPairs = new AtomPair[numCAs-RES_DISTANCE];
     ////////////////////////////////////////////////
     //
     //             WITHIN lRMSD CRITERIA
@@ -103,6 +105,7 @@ public class CreateContactMap{
       //DO NOT NEED TO BE MATRICES -- PUT IN WEKA FORMAT -- vectors
       double[] within_realValueMap = new double[ca_within.length-RES_DISTANCE];
       int[] within_binMap = new int[ca_within.length-RES_DISTANCE];
+      within_atomPairs = new AtomPair[ca_within.length-RES_DISTANCE];
       try{
         //CALC DISTANCES FOR ALPHA CARBONS (within(k) AND ADD TO MAPS
         //for each alpha carbon
@@ -111,6 +114,7 @@ public class CreateContactMap{
           //for each alpha carbon 4 away from current alpha carbon (within(n) and morethan(p))
           for(int n=k+RES_DISTANCE; n<ca_within.length; n++){
             within_realValueMap[numContacts] = Distance.euclideanDistance(ca_within[k], ca_within[n]);
+            within_atomPairs[k] = new AtomPair(ca_within[k], ca_within[n]); 
             //add to binary maps
             if(within_realValueMap[numContacts] > BIN_CRITERIA){
               within_binMap[numContacts] = 0;
@@ -149,6 +153,7 @@ public class CreateContactMap{
           //for each alpha carbon 4 away from current alpha carbon (within(n) and morethan(p))
           for(int n=k+RES_DISTANCE; n<ca_morethan.length; n++){
             morethan_realValueMap[numContacts] = Distance.euclideanDistance(ca_morethan[k], ca_morethan[n]);
+            morethan_atomPairs[k] = new AtomPair(ca_morethan[k], ca_morethan[n]);
             //add to binary map
             if(morethan_realValueMap[numContacts] > BIN_CRITERIA){
               morethan_binMap[numContacts] = 0;
@@ -174,7 +179,7 @@ public class CreateContactMap{
     PrintWriter writer = new PrintWriter(new File("../Data/within_RV_sample.txt"));
     writer.append(withinlRMSD.get(0).toString() + "\r\n");
     for(int i=0; i<within_realValueMaps[0].length; i++){
-      writer.append(within_realValueMaps[0][i] + "\r\n");
+      writer.append(within_atomPairs[i] + ": " + within_realValueMaps[0][i] + "\r\n");
     }
     writer.flush();
     System.out.println("Printing sample maps for models more than criteria to file.");
