@@ -179,7 +179,7 @@ public class CreateContactMap{
     PrintWriter writer = new PrintWriter(new File("../Data/within_RV_sample.txt"));
     writer.append(withinlRMSD.get(0).toString() + "\r\n");
     for(int i=0; i<within_realValueMaps[0].length; i++){
-      writer.append(within_atomPairs[i] + ": " + within_realValueMaps[0][i] + "\r\n");
+     // writer.append(within_atomPairs[i] + ": " + within_realValueMaps[0][i] + "\r\n");
     }
     writer.flush();
     System.out.println("Printing sample maps for models more than criteria to file.");
