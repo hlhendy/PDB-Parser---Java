@@ -47,7 +47,7 @@ public class Parser{
         if(next.equals("END")){
           currStructure.addModel(currModel);
           inModel = false;
-          if(currStructure.size() % 100 == 0){
+          if(currStructure.size() % 1000  == 0){
             System.out.printf("%d models completed\n", currStructure.size());
           }
         }

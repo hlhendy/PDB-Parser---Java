@@ -36,11 +36,11 @@ public class Distance{
      ArrayList<Atom> a1 = m1.getAtomsList();
      ArrayList<Atom> a2 = m2.getAtomsList();
      double distance = 0.0;
-     //if(a1.size() == a2.size()){
+     if(a1.size() == a2.size()){
        for(int i=0; i<a2.size(); i++){
          distance += distanceSquared(a1.get(i), a2.get(i));
        }
-    // }
+     }
      return distance/a1.size();
   }
    
@@ -78,7 +78,7 @@ public class Distance{
 //          LCS[C[i,j]] = x[i]
 //         }
 //         else{
-//          LCS[C[i,j]] = y[j]   //check if this is x[i] and above y[j], in a hurry
+//          LCS[C[i,j]] = y[j]   //check if this is x[i] and above y[j]
 //         }
 //      }
     //}
