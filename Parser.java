@@ -29,14 +29,15 @@ public class Parser{
         if(next.equals("ATOM") && inModel){
           lineScanner.next();
           String atomName = lineScanner.next();
+	  String aaname = lineScanner.next();
           //skip unwanted info
-          for(int i=0; i<3; i++){
+          for(int i=0; i<2; i++){
             lineScanner.next();
           }
           Double x = Double.parseDouble(lineScanner.next());
           Double y = Double.parseDouble(lineScanner.next());
           Double z = Double.parseDouble(lineScanner.next());
-          currAtom = new Atom(atomName, x, y, z);
+          currAtom = new Atom(atomName,aaname, x, y, z);
           currModel.addAtom(currAtom);
         }
         //if token is TER - end model

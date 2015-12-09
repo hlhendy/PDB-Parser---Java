@@ -1,23 +1,26 @@
 public class Atom{
-  String name;
-  double[] coords;
+  private String name;
+  private String aminoAcidName;
+  private double[] coords;
   
   //CONSTRUCTORS
   public Atom(){
-    this.name = new String();
+    this.name = "";
+    this.aminoAcidName = "";
     coords = new double[3];
   }
   
-  public Atom(String name){
-    this();
-    this.name = name;
-  }
+ // public Atom(String name){
+   // this();
+   // this.name = name;
+ // }
 
-  public Atom(String name, double x, double y, double z){
-    this(name);
-    coords[0] = x;
-    coords[1] = y;
-    coords[2] = z;
+  public Atom(String name, String aaname, double x, double y, double z){
+    this.name = name;
+    this.aminoAcidName = aaname;
+    this.coords[0] = x;
+    this.coords[1] = y;
+    this.coords[2] = z;
   }
   
   //METHODS///////////////////////////////            
@@ -30,6 +33,9 @@ public class Atom{
     return name;
   }
   
+  public String getAminoAcidName(){
+    return aminoAcidName;	
+  } 
   public double[] getCoords(){
     return coords;
   }
