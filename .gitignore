@@ -22,7 +22,7 @@ $RECYCLE.BIN/
 *.java~
 
 # Compiled python 
-_pycache_/
+__pycache__/
 
 # =========================
 # Operating System Files
