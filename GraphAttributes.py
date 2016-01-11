@@ -32,9 +32,17 @@ def labelAttributes(graph):
 	nodeList = graph.nodes(data=True)
 	for i,j in enumerate(nodeList[:-1]):
 		if j != nodeList[i+1]:
-			noMatchEdges++
+			noMatchEdges +=  1
 	return_values.append(noMatchEdges/total_edges)		
 	#Neighborhood Impurity: vertex degree for only those with different label
+	deg = 0
+	for node in graph:
+		neighbors = graph.neighbors(node)
+		for n,i in enumerate(neighbors[:-1]):
+			#if labels match, increment degree
+			if n == neighbors[i+1]:
+				deg += 1
+	return_values.append(deg/len(graph.nodes())
 	#Label Entropy: For a graph G with k labels, 
 	##E(G) = - Sum(prob of given label * log prob of given label)
 	return return_values
