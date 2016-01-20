@@ -58,7 +58,6 @@ def main(argv):
 	withinlRMSD, morethanlRMSD = Distance.sortBylRMSDs(nativeconformation, conformations, lRMSD_CRITERIA)
 	
 	#output image of native graph
-	print('Length of native: ' + str(len(nativeconformation[0])))
 	nativeGraph = nx.Graph()
 	curr_conf = nativeconformation[0]
 	for j in range(len(curr_conf)-RES_DISTANCE):
@@ -78,8 +77,9 @@ def main(argv):
 	printGraph(nativeGraph, 'Output/PosGraphs/native')
 	
 	#output graph attributes for each data set
+	#Note: removed newline='' from open() for linux
 	dt = time.strftime("%Y%m%d-%H%M%S")
-	with open('Output/'+output_prefix+dt+'.csv', 'w', newline='') as csvfile:
+	with open('Output/'+output_prefix+dt+'.csv', 'w') as csvfile:
 		writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
 		writer.writerow(['energy', 'second_eigen', 'unique_eigen', 'spectral_rad', 
 			'link_impurity', 'neighborhood_impurity', 'avg_closeness', 'avg_clustering', 'small_worldness', 'near_native'])

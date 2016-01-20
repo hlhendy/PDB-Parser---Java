@@ -36,43 +36,23 @@ def labelAttributes(graph):
 	num_edges = 0
 	edges_sum = 0
 	#Link Impurity: number of edges {u, v} where L(u) != L(v) / number of edges
-<<<<<<< HEAD
-	for e in graph.edges_iter():
+	for u,v in graph.edges():
 		num_edges += 1
-		if(e[0] != e[1]):
+		if(graph.node[u]['aminoAcid'] != graph.node[v]['aminoAcid']):
 			edges_sum += 1
-	return_values.append(edges_sum/num_edges)
-	#Neighborhood Impurity: vertex degree for only those with different label
+	return_values.append(float(edges_sum)/float(num_edges))
+	#Neighborhood Impurity: vertex degree for neighboring nodes with different label
 	deg = 0
 	num_nodes = 0
-	for cn in graph.nodes_iter():
+	for cn in graph.nodes():
 		num_nodes += 1
 		neighborhood = graph.neighbors(cn)
 		for nn in neighborhood:
-			if cn != nn:
+			if graph.node[cn]['aminoAcid'] != graph.node[nn]['aminoAcid']:
 				deg += 1
-	return_values.append(deg/num_nodes)
-=======
-	total_edges = len(graph.edges())
-	noMatchEdges = 0
-	#node list
-	nodeList = graph.nodes(data=True)
-	for i,j in enumerate(nodeList[:-1]):
-		if j != nodeList[i+1]:
-			noMatchEdges +=  1
-	return_values.append(noMatchEdges/total_edges)		
-	#Neighborhood Impurity: vertex degree for only those with different label
-	deg = 0
-	for node in graph:
-		neighbors = graph.neighbors(node)
-		for n,i in enumerate(neighbors[:-1]):
-			#if labels match, increment degree
-			if n == neighbors[i+1]:
-				deg += 1
-	return_values.append(deg/len(graph.nodes())
+	return_values.append(deg/num_nodes)		
 	#Label Entropy: For a graph G with k labels, 
 	##E(G) = - Sum(prob of given label * log prob of given label)
->>>>>>> 21fede94458d13ec4aaa92ebe6d4ed71ef1245d4
 	return return_values
 	
 def clusterAttributes(graph):
@@ -104,7 +84,7 @@ def clusterAttributes(graph):
 	Crand = nx.average_clustering(rand_graph)
 	##compare with actual graph
 	if(Lg != 0 and Lrand !=0 and Crand !=0):
-		S = (Cg/Crand) / (Lg/Lrand)
+		S = (float(Cg)/float(Crand)) / (float(Lg)/float(Lrand))
 	else:
 		S = 0
 	return_values.append(S)
