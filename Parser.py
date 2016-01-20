@@ -18,7 +18,6 @@ def countAtoms(file_in):
         atom_chars = []
         models = 0
         #read first model and store atom names only
-        #TODO: Strip to return only char for name
         while models < 1:
                 line = f_read.readline()
                 splt = line.split()
@@ -58,6 +57,7 @@ def readConformations(file_in, nr_models, lcs):
 			nr_atoms += 1
 			if(splt[2] == 'CA' and (len(lcs) == 0 or nr_atoms in lcs)):
 				#store amino acid names as labels
+				#only need to do this once
 				if(models < 1):
 					labels.append(str(splt[3]))
 				#store coords for each atom

@@ -1,4 +1,3 @@
-
 import networkx as nx
 import csv
 import sys
@@ -7,6 +6,7 @@ import numpy.linalg
 import Parser
 import Distance
 import GraphAttributes
+from matplotlib import pyplot as plt
 
 ##CONSTANTS
 lRMSD_CRITERIA = 2
@@ -20,10 +20,24 @@ BIN_CRITERIA = 8
 
 def graphAttributes(graph):
 	attributes = []
-	attributes.append(GraphAttributes.eigenvalueAttributes(graph))
-	attributes.append(GraphAttributes.labelAttributes(graph))
-	attributes.append(GraphAttributes.clusterAttributes(graph))
+	for a in GraphAttributes.eigenvalueAttributes(graph):
+		attributes.append(a)
+	for a in GraphAttributes.labelAttributes(graph):
+		attributes.append(a)
+	for a in GraphAttributes.clusterAttributes(graph):
+		attributes.append(a)
 	return attributes
+	
+def printGraph(graph, filename):
+	G = graph
+	pos = nx.spring_layout(G)
+	nx.draw(G, pos)
+	node_labels = nx.get_node_attributes(G,'aminoAcid')
+	nx.draw_networkx_labels(G, pos, labels = node_labels)
+	#edge_labels = nx.get_edge_attributes(G, 'distance')
+	#nx.draw_networkx_edge_labels(G, pos, labels = edge_labels)
+	plt.savefig(filename + '.png')
+	#plt.show()
 
 #######################################################################################
 def main(argv):
@@ -40,17 +54,35 @@ def main(argv):
 		sys.exit(2)
 	#Create lists of conformations	
 	labels, nativeconformation, conformations = Parser.PDB(native_in, file_in, nr_models)
-
 	#Sort into positive and negative sets using lRMSD 
 	withinlRMSD, morethanlRMSD = Distance.sortBylRMSDs(nativeconformation, conformations, lRMSD_CRITERIA)
+	
+	#output image of native graph
+	print('Length of native: ' + str(len(nativeconformation[0])))
+	nativeGraph = nx.Graph()
+	curr_conf = nativeconformation[0]
+	for j in range(len(curr_conf)-RES_DISTANCE):
+		for k in range(j+RES_DISTANCE, len(curr_conf)):
+			atom1 = curr_conf[j]
+			atom2 = curr_conf[k]
+			#add nodes to graph with labels
+			nativeGraph.add_node(j)
+			nativeGraph.node[j]['aminoAcid'] = labels[j]
+			nativeGraph.add_node(k)
+			nativeGraph.node[k]['aminoAcid'] = labels[k]
+			#find euclidean distance between atoms
+			d = Distance.euclideanDistance(atom1, atom2)
+			#if less than BIN_CRITERIA, add edge
+			if(d <= BIN_CRITERIA):
+				nativeGraph.add_edge(j, k, distance=d)
+	printGraph(nativeGraph, 'Output/PosGraphs/native')
 	
 	#output graph attributes for each data set
 	dt = time.strftime("%Y%m%d-%H%M%S")
 	with open('Output/'+output_prefix+dt+'.csv', 'w', newline='') as csvfile:
-		writer = csv.writer(csvfile, delimiter=',',
-                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
-		writer.writerow(['energy', 'link_impurity', 'num_eigen', 'deg_imp', 'spectral_rad', 'label_entropy', 
-			'closeness_centrality', 'clustering_coeff', 'second_eigen', 'small_worldness', 'near_native'])
+		writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
+		writer.writerow(['energy', 'second_eigen', 'unique_eigen', 'spectral_rad', 
+			'link_impurity', 'neighborhood_impurity', 'avg_closeness', 'avg_clustering', 'small_worldness', 'near_native'])
 		#Positive Data Set
 		for i in range(len(withinlRMSD)):
 			graph = nx.Graph()
@@ -60,13 +92,18 @@ def main(argv):
 					atom1 = curr_conf[j]
 					atom2 = curr_conf[k]
 					#add nodes to graph with labels
-					graph.add_node(j, label=labels[j])
-					graph.add_node(k, label=labels[k])
+					graph.add_node(j)
+					graph.node[j]['aminoAcid'] = labels[j]
+					graph.add_node(k)
+					graph.node[k]['aminoAcid'] = labels[k]
 					#find euclidean distance between atoms
 					d = Distance.euclideanDistance(atom1, atom2)
 					#if less than BIN_CRITERIA, add edge
 					if(d <= BIN_CRITERIA):
-						graph.add_edge(j, k)
+						graph.add_edge(j, k, distance=d)
+			##FOR TESTING ONLY
+			#printGraph(graph, 'Output/PosGraphs/pos_'+str(i))
+			#################
 			#once graph is done, create attribute vector
 			attributes = graphAttributes(graph)
 			#add 1 to the end since near native
@@ -82,13 +119,18 @@ def main(argv):
 					atom1 = curr_conf[j]
 					atom2 = curr_conf[k]
 					#add nodes to graph with labels
-					graph.add_node(j, label=atom1[0])
-					graph.add_node(k, label=atom2[0])
+					graph.add_node(j)
+					graph.node[j]['aminoAcid'] = labels[j]
+					graph.add_node(k)
+					graph.node[k]['aminoAcid'] = labels[k]
 					#find euclidean distance between atoms
 					d = Distance.euclideanDistance(atom1, atom2)
 					#if less than BIN_CRITERIA, add edge
 					if(d <= BIN_CRITERIA):
-						graph.add_edge(j, k)
+						graph.add_edge(j, k, distance=d)
+			##FOR TESTING ONLY
+			#printGraph(graph, 'Output/NegGraphs/neg_'+str(i))
+			#################
 			#once graph is done, create attribute vector
 			attributes = graphAttributes(graph)
 			#add 0 to the end since decoy
