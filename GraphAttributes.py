@@ -36,6 +36,7 @@ def labelAttributes(graph):
 	num_edges = 0
 	edges_sum = 0
 	#Link Impurity: number of edges {u, v} where L(u) != L(v) / number of edges
+<<<<<<< HEAD
 	for e in graph.edges_iter():
 		num_edges += 1
 		if(e[0] != e[1]):
@@ -51,6 +52,27 @@ def labelAttributes(graph):
 			if cn != nn:
 				deg += 1
 	return_values.append(deg/num_nodes)
+=======
+	total_edges = len(graph.edges())
+	noMatchEdges = 0
+	#node list
+	nodeList = graph.nodes(data=True)
+	for i,j in enumerate(nodeList[:-1]):
+		if j != nodeList[i+1]:
+			noMatchEdges +=  1
+	return_values.append(noMatchEdges/total_edges)		
+	#Neighborhood Impurity: vertex degree for only those with different label
+	deg = 0
+	for node in graph:
+		neighbors = graph.neighbors(node)
+		for n,i in enumerate(neighbors[:-1]):
+			#if labels match, increment degree
+			if n == neighbors[i+1]:
+				deg += 1
+	return_values.append(deg/len(graph.nodes())
+	#Label Entropy: For a graph G with k labels, 
+	##E(G) = - Sum(prob of given label * log prob of given label)
+>>>>>>> 21fede94458d13ec4aaa92ebe6d4ed71ef1245d4
 	return return_values
 	
 def clusterAttributes(graph):
