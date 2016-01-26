@@ -9,7 +9,7 @@ import GraphAttributes
 from matplotlib import pyplot as plt
 
 ##CONSTANTS
-lRMSD_CRITERIA = 2
+lRMSD_CRITERIA = 3 #(between 2-4)
 RES_DISTANCE = 4
 BIN_CRITERIA = 8
 
@@ -20,6 +20,8 @@ BIN_CRITERIA = 8
 
 def graphAttributes(graph):
 	attributes = []
+	for a in GraphAttributes.generalAttributes(graph):
+		attributes.append(a)
 	for a in GraphAttributes.eigenvalueAttributes(graph):
 		attributes.append(a)
 	for a in GraphAttributes.labelAttributes(graph):
@@ -81,7 +83,7 @@ def main(argv):
 	dt = time.strftime("%Y%m%d-%H%M%S")
 	with open('Output/'+output_prefix+dt+'.csv', 'w') as csvfile:
 		writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
-		writer.writerow(['energy', 'second_eigen', 'unique_eigen', 'spectral_rad', 
+		writer.writerow(['num_edges', 'density','avg_degree','percent_endpoints','energy', 'second_eigen', 'unique_eigen', 'spectral_rad', 
 			'link_impurity', 'neighborhood_impurity', 'avg_closeness', 'avg_clustering', 'small_worldness', 'near_native'])
 		#Positive Data Set
 		for i in range(len(withinlRMSD)):

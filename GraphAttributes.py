@@ -2,6 +2,31 @@ import networkx as nx
 import numpy
 import math
 
+def generalAttributes(graph):
+	return_values = []
+	#Number of edges
+	return_values.append(nx.number_of_edges(graph))	
+	#Density
+	return_values.append(nx.density(graph))
+	#Average Degree
+	num_endpoints = 0
+	degrees = nx.degree(graph)
+	deg_sum = 0
+	for d in degrees:
+		if d == 1:
+			num_endpoints += 1
+		deg_sum += 1
+	return_values.append(float(deg_sum)/len(degrees))
+	#Percentage of endpoints(number of nodes with deg=1)	
+	return_values.append(float(num_endpoints)/len(degrees))
+	return return_values
+
+#def eccentricityAttributes(graph):
+	#Average effective eccentricity
+	#Effective diameter
+	#Effective radius
+	#Percentage central nodes
+
 def eigenvalueAttributes(graph):
 	return_values = []
 	#Compute eigenvalues on L as ndarray object
@@ -83,8 +108,8 @@ def clusterAttributes(graph):
 	Lrand = Lrand / len(LrandVals)
 	Crand = nx.average_clustering(rand_graph)
 	##compare with actual graph
-	if(Lg != 0 and Lrand !=0 and Crand !=0):
-		S = (float(Cg)/float(Crand)) / (float(Lg)/float(Lrand))
+	if(Lg!= 0 and Lrand !=0 and Crand !=0):
+		S = (float(Cg)/(Crand)) / (float(Lg)/(Lrand))
 	else:
 		S = 0
 	return_values.append(S)
