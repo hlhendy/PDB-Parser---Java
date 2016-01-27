@@ -13,11 +13,13 @@ lRMSD_CRITERIA = 3 #(between 2-4)
 RES_DISTANCE = 4
 BIN_CRITERIA = 8
 
-#Attributes: 
-#EIGENVALUE-BASED(0-3): energy, 2nd largest, #distict values, spectral radius
-#LABELS-BASED(4-6): link impurity, neighborhood impurity, label entropy
-#CLUSTER-BASED(7-10): closeness centrality, clustering coefficient, small-worldness criteria
-
+#Attributes(18):
+#GENERAL: 		number of edges, avg. degree, density, %endpoints 
+#EIGENVALUE-BASED: 	energy, 2nd largest, #distict values, spectral radius
+#LABELS-BASED: 		link impurity, neighborhood impurity, label entropy
+#CLUSTER-BASED: 	closeness centrality, clustering coefficient
+#SMALL-WORLDNESS:	small-worldness criteria
+#ECCENTRICITY-BASED:	avg eccentricity, diameter, radius, %central nodes
 def graphAttributes(graph):
 	attributes = []
 	for a in GraphAttributes.generalAttributes(graph):
@@ -27,6 +29,10 @@ def graphAttributes(graph):
 	for a in GraphAttributes.labelAttributes(graph):
 		attributes.append(a)
 	for a in GraphAttributes.clusterAttributes(graph):
+		attributes.append(a)
+	for a in GraphAttributes.smallWorldness(graph):
+		attributes.append(a)
+	for a in GraphAttributes.eccentricityAttributes(graph):
 		attributes.append(a)
 	return attributes
 	
@@ -84,7 +90,8 @@ def main(argv):
 	with open('Output/'+output_prefix+dt+'.csv', 'w') as csvfile:
 		writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
 		writer.writerow(['num_edges', 'density','avg_degree','percent_endpoints','energy', 'second_eigen', 'unique_eigen', 'spectral_rad', 
-			'link_impurity', 'neighborhood_impurity', 'avg_closeness', 'avg_clustering', 'small_worldness', 'near_native'])
+			'link_impurity', 'neighborhood_impurity', 'avg_closeness', 'avg_clustering', 'small_worldness','eccentricity','diameter',
+			'radius','%central_nodes', 'near_native'])
 		#Positive Data Set
 		for i in range(len(withinlRMSD)):
 			graph = nx.Graph()

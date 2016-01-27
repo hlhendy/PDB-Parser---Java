@@ -1,0 +1,2 @@
+num_edges,density,avg_degree,percent_endpoints,energy,second_eigen,unique_eigen,spectral_rad,link_impurity,neighborhood_impurity,avg_closeness,avg_clustering,small_worldness,eccentricity,diameter,radius,%central_nodes,near_native
+105,0.043478260869565216,3.0,0.21428571428571427,4899.9999999999982,1.940070596395749,70,1.9463014524794588,0.9523809523809523,2,0.22092068341210694,0.09404761904761905,1.3478723404255322,10.357142857142858,15,8,0.07142857142857142,1

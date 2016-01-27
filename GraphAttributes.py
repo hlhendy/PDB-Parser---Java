@@ -1,6 +1,19 @@
 import networkx as nx
 import numpy
 import math
+import operator
+
+def shortest_path_lengths(graph):
+	n = nx.number_of_nodes(graph)
+	spl = []
+	for i in range(n):
+		for j in range(n):
+			if i != j:
+				try:
+					spl.append(nx.shortest_path_length(graph, i, j))
+				except nx.NetworkXNoPath:
+					spl.append(0)
+	return spl
 
 def generalAttributes(graph):
 	return_values = []
@@ -12,20 +25,42 @@ def generalAttributes(graph):
 	num_endpoints = 0
 	degrees = nx.degree(graph)
 	deg_sum = 0
-	for d in degrees:
-		if d == 1:
+	for i in degrees:
+		if degrees[i] == 1:
 			num_endpoints += 1
-		deg_sum += 1
+		deg_sum += degrees[i]
 	return_values.append(float(deg_sum)/len(degrees))
 	#Percentage of endpoints(number of nodes with deg=1)	
 	return_values.append(float(num_endpoints)/len(degrees))
 	return return_values
 
-#def eccentricityAttributes(graph):
+def eccentricityAttributes(graph):
+	return_values = []
 	#Average effective eccentricity
+	eccVals = []
+	e = 0
+	for n in graph.nodes():
+		try: 
+			eccVals.append(nx.eccentricity(graph, v=n))
+			#eccVals.append((max(e.iteritems(), key=operator.itemgetter(1)))
+		except nx.NetworkXError:
+			eccVals.append(0)
+	eccSum = 0
+	center_nodes = 0
+	diameter = max(eccVals)
+	radius = min(eccVals)
+	for i in range(len(eccVals)):
+		if eccVals[i] ==  radius:
+			center_nodes += 1
+		eccSum += eccVals[i]
+	return_values.append(eccSum / float(nx.number_of_nodes(graph)))	
 	#Effective diameter
+	return_values.append(diameter)
 	#Effective radius
+	return_values.append(radius)
 	#Percentage central nodes
+	return_values.append(center_nodes / float(nx.number_of_nodes(graph)))
+	return return_values
 
 def eigenvalueAttributes(graph):
 	return_values = []
@@ -85,31 +120,43 @@ def clusterAttributes(graph):
 	#Closeness centrality: mean shortest path length
 	#nx.closeness_centrality returns dict with val for each node
 	#need to find average
-	LgVals = nx.closeness_centrality(graph)
-	Lg = 0
-	for v in LgVals:
-		Lg += LgVals[v]
-	Lg = Lg / len(LgVals)
-	return_values.append(Lg)
+	closenessVals = nx.closeness_centrality(graph)
+	c = 0
+	for v in closenessVals:
+		c += closenessVals[v]
+	c = c / len(closenessVals)
+	return_values.append(c)
 	#Average clustering coefficient
-	Cg = nx.average_clustering(graph)
-	return_values.append(Cg)
+	clustering = nx.average_clustering(graph)
+	return_values.append(clustering)
+	return return_values
+
+def smallWorldness(graph):
+	return_values = []
 	#Small-worldness criteria
-	##generate random graph and get closeness/clustering
 	n = len(nx.nodes(graph))
 	e = len(nx.edges(graph))
-	#probability of edges: number of edges in real graph/possible edges
-	p = e/(n*(n-1)/2)
+	#probability of edges: (number of edges in real graph)/possible edges
+	p = e/float((n*(n-1)/2.0))
+	#generate random graph using probability
 	rand_graph = nx.fast_gnp_random_graph(n, p)
-	LrandVals = nx.closeness_centrality(rand_graph)
+	#calculate values for real graph and random graph
+	Creal = nx.transitivity(graph) #float
+	Crand = nx.transitivity(rand_graph) #float
+	Lreal = 0
 	Lrand = 0
-	for v in LgVals:
-		Lrand += LrandVals[v]
-	Lrand = Lrand / len(LrandVals)
-	Crand = nx.average_clustering(rand_graph)
-	##compare with actual graph
-	if(Lg!= 0 and Lrand !=0 and Crand !=0):
-		S = (float(Cg)/(Crand)) / (float(Lg)/(Lrand))
+	real_sum = 0
+	rand_sum = 0
+	splReal = shortest_path_lengths(graph)
+	splRand = shortest_path_lengths(rand_graph)
+	for i in range(len(splReal)):
+		real_sum += splReal[i]
+		rand_sum += splRand[i]
+	Lreal = real_sum / n*(n-1)
+	Lrand = rand_sum / n*(n-1)		
+	#compare with actual graph
+	if(Lreal != 0 and Lrand !=0 and Crand !=0):
+		S = (Creal)/(Crand) / (float(Lreal)/(Lrand))
 	else:
 		S = 0
 	return_values.append(S)
