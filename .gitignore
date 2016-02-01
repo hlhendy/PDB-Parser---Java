@@ -23,6 +23,11 @@ $RECYCLE.BIN/
 
 # Compiled python 
 __pycache__/
+.pyc
+.py~
+
+#Output
+.csv
 
 # =========================
 # Operating System Files

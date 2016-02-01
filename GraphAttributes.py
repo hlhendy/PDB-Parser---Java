@@ -42,13 +42,12 @@ def eccentricityAttributes(graph):
 	for n in graph.nodes():
 		try: 
 			eccVals.append(nx.eccentricity(graph, v=n))
-			#eccVals.append((max(e.iteritems(), key=operator.itemgetter(1)))
 		except nx.NetworkXError:
 			eccVals.append(0)
 	eccSum = 0
 	center_nodes = 0
-	diameter = max(eccVals)
-	radius = min(eccVals)
+	diameter = eccVals[max(eccVals)]
+	radius = eccVals[min(eccVals)]
 	for i in range(len(eccVals)):
 		if eccVals[i] ==  radius:
 			center_nodes += 1
@@ -65,26 +64,26 @@ def eccentricityAttributes(graph):
 def eigenvalueAttributes(graph):
 	return_values = []
 	#Compute eigenvalues on L as ndarray object
-	L = nx.normalized_laplacian_matrix(graph)
-	e = numpy.linalg.eigvals(L.A)
+	#L = nx.normalized_laplacian_matrix(graph)
+	#e = numpy.linalg.eigvals(L.A)
+	e = nx.adjacency_spectrum(graph) #numPy array
 	#energy: squared sum of eigenvalues
 	eig_sum = 0
 	largest = 0
 	second_largest = 0
+	unique_values = []
 	for i in e:
-		eig_sum += i
+		eig_sum += (i*i)
 		if math.fabs(i) > largest:
 			largest = i
 		elif math.fabs(i) > second_largest:
 			second_largest = i
-	return_values.append(eig_sum*eig_sum)
+		if i not in unique_values:
+			unique_values.append(i)
+	return_values.append(eig_sum)
 	#Second largest |eigenvalue| <------------CHECK WHETHER ABS VAL
 	return_values.append(second_largest)
 	#Number distict eigenvalues
-	unique_values = []
-	for v in e:
-		if v not in unique_values:
-			unique_values.append(v)
 	return_values.append(len(unique_values))
 	#Spectral Radius: largest |eigenvalue|
 	return_values.append(largest)
@@ -100,7 +99,7 @@ def labelAttributes(graph):
 		num_edges += 1
 		if(graph.node[u]['aminoAcid'] != graph.node[v]['aminoAcid']):
 			edges_sum += 1
-	return_values.append(float(edges_sum)/float(num_edges))
+	return_values.append(float(edges_sum)/num_edges)
 	#Neighborhood Impurity: vertex degree for neighboring nodes with different label
 	deg = 0
 	num_nodes = 0
@@ -111,8 +110,6 @@ def labelAttributes(graph):
 			if graph.node[cn]['aminoAcid'] != graph.node[nn]['aminoAcid']:
 				deg += 1
 	return_values.append(deg/num_nodes)		
-	#Label Entropy: For a graph G with k labels, 
-	##E(G) = - Sum(prob of given label * log prob of given label)
 	return return_values
 	
 def clusterAttributes(graph):
@@ -152,8 +149,8 @@ def smallWorldness(graph):
 	for i in range(len(splReal)):
 		real_sum += splReal[i]
 		rand_sum += splRand[i]
-	Lreal = real_sum / n*(n-1)
-	Lrand = rand_sum / n*(n-1)		
+	Lreal = real_sum / len(splReal)
+	Lrand = rand_sum / len(splRand)		
 	#compare with actual graph
 	if(Lreal != 0 and Lrand !=0 and Crand !=0):
 		S = (Creal)/(Crand) / (float(Lreal)/(Lrand))
