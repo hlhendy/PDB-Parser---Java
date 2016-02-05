@@ -3,19 +3,11 @@ import Distance
 import sys
 import csv
 
-def main(argv):
-	#Open files
-	if len(argv) != 3:
-		print('USAGE: <native pdb> <decoy pdb> <model limit>')
-		sys.exit(2)
-	try:
-		native_in = str(argv[0])
-		file_in = str(argv[1])
-		nr_models = int(argv[2])
-		output_file = 'Output/dataSetBreakdown.csv'
-	except:
-		print('USAGE: <native pdb> <decoy pdb> <model limit>')
-		sys.exit(2)
+def breakdown(n, f, m, o):
+	native_in = n
+	file_in = f
+	nr_models = m
+	output_file = o
 	#Count atoms and calculate LCS if needed
 	native_atoms = Parser.countAtoms(native_in)
 	decoy_atoms = Parser.countAtoms(file_in)
@@ -34,6 +26,10 @@ def main(argv):
 	nr_atoms = 0
 	output_data = []
 	currConf = []
+	within2 = 0
+	morethan2 = 0
+	within4= 0
+	morethan4 = 0
 	while models < nr_models:
 		line = f_read.readline()
 		splt = line.split()
@@ -48,7 +44,8 @@ def main(argv):
 		elif splt[0] == 'TER':
 			if(len(atoms) > 0):
 				currConf.append(atoms)
-				distance = Distance.lrmsd(nativeconformation, currConf)
+				models += 1
+				distance = Distance.lrmsd(nativeconformation[0], currConf[0])
 				if distance <= criteria[0]:
 					within2 += 1
 				else:
@@ -58,10 +55,37 @@ def main(argv):
 					else: 
 						morethan4 += 1
 	#Output results in table with protein name, lcs length, number within/morethan for each criteria
-	output_data.append(native_in, len(decoy_result),within2, morethan2, within4, morethan4)
+	output_data.append(native_in[5:-4])
+	output_data.append(len(decoy_result))
+	output_data.append(within2)
+	output_data.append(morethan2)
+	output_data.append(within4)
+	output_data.append(morethan4)
 	with open(output_file, 'a') as csvfile:
-		writer = csv.Writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
+		writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
 		writer.writerow(output_data)
+	print("Completed")
+	
+def main(argv):
+	if len(argv) != 1:
+		print("Please enter name of dat file")
+		sys.exit(2)
+	try:
+		dat_file = argv[0]
+	except:
+		print("Please enter name of dat file")
+		sys.exit(2)
+	#Data file should include number of proteins as first line
+	#Each line should contain <native file> <conf file> <number of models>
+	output_file = 'Output/DatSetBreakdown.csv'
+	with open(output_file, 'a') as csvfile:
+		writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
+		writer.writerow(['Protein Name', 'LCS', 'Within 2', 'Morethan 2', 'Within 4', 'Morethan 4'])
+	#For each line, assign argument variables and send to dataSetBreakdown
+	#while(next line):
+		#line = line.next
+		#native_in = split(line)[0] ... and so on
+		dataSetBreakdown.breakdown(native_in, file_in, nr_models, output_file)
 
 if __name__ == "__main__":
-	main(sys.argv[1:])	
+	main(sys.argv[1:])
