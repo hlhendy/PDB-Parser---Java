@@ -12,6 +12,9 @@ from matplotlib import pyplot as plt
 lRMSD_CRITERIA = 3 #(between 2-4)
 RES_DISTANCE = 4
 BIN_CRITERIA = 8
+HPHOBIC = ['ALA', 'ILE', 'LEU', 'PHE', 'VAL', 'PRO', 'GLY']
+HPHILIC = ['ARG', 'LYS', 'ASP', 'GLU', 'GLN', 'ASN', 'HIS', 
+			'SER', 'THR', 'TYR', 'CYS', 'MET', 'TRP']
 
 #Attributes(18):
 #GENERAL: 		number of edges, avg. degree, density, %endpoints 
@@ -97,7 +100,11 @@ def main(argv):
 			graph = nx.Graph()
 			curr_conf = withinlRMSD[i]
 			for j in range(len(curr_conf)-RES_DISTANCE):
-				for k in range(j+RES_DISTANCE, len(curr_conf)):
+				if j + RES_DISTANCE < len(curr_conf):
+					k = j + RES_DISTANCE
+				else:
+					k = (j + RES_DISTANCE) - len(curr_conf)#wrap around??
+				#for k in range(j+RES_DISTANCE, len(curr_conf)):
 					atom1 = curr_conf[j]
 					atom2 = curr_conf[k]
 					#add nodes to graph with labels
@@ -130,8 +137,16 @@ def main(argv):
 					#add nodes to graph with labels
 					graph.add_node(j)
 					graph.node[j]['aminoAcid'] = labels[j]
+					if(labels[j] in HPHOBIC):
+						graph.node[j]['hydro'] = 'phobic'
+					else:
+						graph.node[j]['hydro'] = 'philic'
 					graph.add_node(k)
 					graph.node[k]['aminoAcid'] = labels[k]
+					if(labels[k] in HPHOBIC):
+						graph.node[k]['hydro'] = 'phobic'
+					else:
+						graph.node[k]['hydro'] = 'philic'
 					#find euclidean distance between atoms
 					d = Distance.euclideanDistance(atom1, atom2)
 					#if less than BIN_CRITERIA, add edge

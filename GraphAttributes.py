@@ -81,7 +81,8 @@ def eigenvalueAttributes(graph):
 		if i not in unique_values:
 			unique_values.append(i)
 	return_values.append(eig_sum)
-	#Second largest |eigenvalue| <------------CHECK WHETHER ABS VAL
+	#Second largest eigenvalue - http://docs.scipy.org/doc/numpy-1.10.1/reference/generated/numpy.linalg.eigvals.html
+	## -------> returns values with multiplicity and not in any order; not necessarily real for real matrices
 	return_values.append(second_largest)
 	#Number distict eigenvalues
 	return_values.append(len(unique_values))
@@ -97,7 +98,7 @@ def labelAttributes(graph):
 	#Link Impurity: number of edges {u, v} where L(u) != L(v) / number of edges
 	for u,v in graph.edges():
 		num_edges += 1
-		if(graph.node[u]['aminoAcid'] != graph.node[v]['aminoAcid']):
+		if(graph.node[u]['hydro'] != graph.node[v]['hydro']):
 			edges_sum += 1
 	return_values.append(float(edges_sum)/num_edges)
 	#Neighborhood Impurity: vertex degree for neighboring nodes with different label
@@ -107,7 +108,7 @@ def labelAttributes(graph):
 		num_nodes += 1
 		neighborhood = graph.neighbors(cn)
 		for nn in neighborhood:
-			if graph.node[cn]['aminoAcid'] != graph.node[nn]['aminoAcid']:
+			if graph.node[cn]['hydro'] != graph.node[nn]['hydro']:
 				deg += 1
 	return_values.append(deg/num_nodes)		
 	return return_values
