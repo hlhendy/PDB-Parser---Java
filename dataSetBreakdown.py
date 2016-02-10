@@ -19,10 +19,11 @@ def main(argv):
 	native_atoms = Parser.countAtoms(native_in)
 	decoy_atoms = Parser.countAtoms(file_in)
 	if len(native_atoms) != len(decoy_atoms):
-		print("Unequal: Native has " + str(len(native_atoms)) + " and conf has " + str(len(decoy_atoms)))
+		print("Unequal, find longest common sequence")
 		native_result, decoy_result = Parser.lcs(native_atoms, decoy_atoms)
 	else:
-		native_result, decoy_result = []	
+		native_result = []
+		decoy_result = []	
 	#Read and store native conformation
 	nativelabels, nativeconformation = Parser.readConformations(str(native_in), 1, native_result)
 	#Read decoys and store how many are within distance, morethan distance
@@ -31,7 +32,7 @@ def main(argv):
 	#f_read = open(str(file_in), 'r')
 	models = 0
 	atoms = []
-	nr_atoms = 0
+	alpha_carbons = 1
 	output_data = []
 	currConf = []
 	within2 = 0
@@ -46,11 +47,12 @@ def main(argv):
 			if splt[0] == 'MODEL':
 				atoms = []
 				currConf = []
-				nr_atoms = 0
+				alpha_carbons = 1
 			elif splt[0] == 'ATOM':
-				nr_atoms += 1
-				if(splt[2] == 'CA' and (len(decoy_result) == 0 or nr_atoms in decoy_result)):
-					atoms.append((float(splt[6]), float(splt[7]), float(splt[8])))
+				if(splt[2] == 'CA'):
+					if(len(decoy_result) == 0 or alpha_carbons in decoy_result):
+						atoms.append((float(splt[6]), float(splt[7]), float(splt[8])))
+					alpha_carbons += 1
 			elif splt[0] == 'TER':
 				if(len(atoms) > 0):
 					currConf.append(atoms)

@@ -22,8 +22,8 @@ def countAtoms(file_in):
                 line = f_read.readline()
                 splt = line.split()
                 #parse lines
-                if splt[0] == 'ATOM':
-                        atom_chars.append(str(splt[2])) #TODO: change this to capture last columnn instead, for consistancy
+                if splt[0] == 'ATOM' and splt[2] == 'CA': #changed to capture only CA atoms
+                        atom_chars.append(int(splt[5])) #Changed to capture residue number rather than atom name
                 elif splt[0] == 'TER': # or splt[0] == 'END' or splt[0] == 'ENDMDL':
                         if len(atom_chars) > 0:
                                 models +=1
@@ -40,7 +40,7 @@ def countAtoms(file_in):
 def readConformations(file_in, nr_models, lcs):
 	f_read = open(str(file_in), 'r')
 	models = 0
-	nr_atoms = 0
+	alpha_carbons = 1
 	conformations = []
 	atoms = []
 	labels = []
@@ -52,23 +52,24 @@ def readConformations(file_in, nr_models, lcs):
 		#parse lines
 		if(splt[0] == 'MODEL'):
 			atoms = []
-			nr_atoms = 0
+			alpha_carbons = 1
 		elif splt[0] == 'ATOM':
-			nr_atoms += 1
-			if(splt[2] == 'CA' and (len(lcs) == 0 or nr_atoms in lcs)):
-				#store amino acid names as labels
-				#only need to do this once
-				if(models < 1):
-					labels.append(str(splt[3]))
-				#store coords for each atom
-				atoms.append((float(splt[6]), float(splt[7]), float(splt[8])))
+			if(splt[2] == 'CA'):
+				if(len(lcs) == 0 or alpha_carbons in lcs):
+					#Store coords for atom
+					atoms.append((float(splt[6]), float(splt[7]), float(splt[8])))
+					#store amino acid names as labels
+					#only need to do this once
+					if(models < 1):
+						labels.append(str(splt[3]))
+				alpha_carbons += 1
 		elif splt[0] == 'TER': # or splt[0] == 'END' or splt[0] == 'ENDMDL':
 			if(len(atoms) > 0):
 				conformations.append(atoms)
 				models +=1
 			else:
 				print("0 atoms at model ", models)
-			if models % 100 == 0:
+			if models % 1000 == 0:
 				print("read model", models, "with ", len(atoms), "CA atoms")
 	return labels, conformations
 
@@ -84,7 +85,7 @@ def lcs(X , Y):
 	dir = np.zeros((m+1, n+1))
 	for i in range(m+1):
 		for j in range(n+1):
-			if Counter(X[i-1]) == Counter(Y[j-1]):
+			if X[i-1] == Y[j-1]: #Removed Counter, just comparings ints now
 				C[i][j] = C[i-1][j-1]+1
 				dir[i][j] = 1 #diagonal
 			else:
@@ -102,10 +103,10 @@ def lcs(X , Y):
 	i = m
 	j = n
 	while(i>0 and j>0):
-		if Counter(X[i-1]) == Counter(Y[j-1]):
-			LCS = X[i-1] + "-" + LCS
-			result_X.append(i)
-			result_Y.append(j)
+		if X[i-1] == Y[j-1]: #Removed Counter, just comparing ints now
+			LCS = str(X[i-1]) + "-" + LCS
+			result_X.append(X[i-1])
+			result_Y.append(Y[j-1])
 			i-= 1
 			j-= 1
 			length -= 1
@@ -114,7 +115,7 @@ def lcs(X , Y):
 			i-= 1
 		else:
 			#lCS[C[i][j]] = Y[j]
-			j-= 1
+			j-= 1	
 	return result_X, result_Y
 
 #######################################################################################
