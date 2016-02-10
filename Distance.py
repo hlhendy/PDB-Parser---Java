@@ -1,7 +1,7 @@
 ##Calculate lRMSD and either output list of lRMSD values
 ##or return two lists sorted by withinLRMSD or moreThanLRMSD
 ##given a certain criteria
-import scipy.spatial
+#import scipy.spatial
 import math
 import sys, getopt
 import random
@@ -13,7 +13,7 @@ import numpy as np
 from numpy.linalg import det, svd
 import os
 import time
-import scipy as sp
+#import scipy as sp
 from operator import itemgetter, attrgetter, methodcaller
 
 ##########################################################
