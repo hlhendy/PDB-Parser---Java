@@ -22,8 +22,13 @@ def countAtoms(file_in):
                 line = f_read.readline()
                 splt = line.split()
                 #parse lines
+<<<<<<< HEAD
                 if splt[0] == 'ATOM' and splt[2] == 'CA': #changed to capture only CA atoms
                         atom_chars.append(int(splt[5])) #Changed to capture residue number rather than atom name
+=======
+                if splt[0] == 'ATOM':
+                        atom_chars.append(str(splt[2])) #TODO: change this to capture last columnn instead, for consistancy
+>>>>>>> 85092edccbc979a0ee1ca9e92795000d11b4cb86
                 elif splt[0] == 'TER': # or splt[0] == 'END' or splt[0] == 'ENDMDL':
                         if len(atom_chars) > 0:
                                 models +=1
@@ -103,10 +108,17 @@ def lcs(X , Y):
 	i = m
 	j = n
 	while(i>0 and j>0):
+<<<<<<< HEAD
 		if X[i-1] == Y[j-1]: #Removed Counter, just comparing ints now
 			LCS = str(X[i-1]) + "-" + LCS
 			result_X.append(X[i-1])
 			result_Y.append(Y[j-1])
+=======
+		if Counter(X[i-1]) == Counter(Y[j-1]):
+			LCS = X[i-1] + "-" + LCS
+			result_X.append(i)
+			result_Y.append(j)
+>>>>>>> 85092edccbc979a0ee1ca9e92795000d11b4cb86
 			i-= 1
 			j-= 1
 			length -= 1
@@ -150,6 +162,5 @@ def PDB(native_in, file_in, nr_models):
 	##############################################################################
 
 	
-
 
 

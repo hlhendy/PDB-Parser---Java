@@ -26,6 +26,9 @@ __pycache__/
 .pyc
 .py~
 
+#INPUT
+.pdb
+
 #Output
 .csv
 

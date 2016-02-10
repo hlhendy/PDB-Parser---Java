@@ -19,7 +19,11 @@ def main(argv):
 	native_atoms = Parser.countAtoms(native_in)
 	decoy_atoms = Parser.countAtoms(file_in)
 	if len(native_atoms) != len(decoy_atoms):
+<<<<<<< HEAD
 		print("Unequal, find longest common sequence")
+=======
+		print("Unequal: Native has " + str(len(native_atoms)) + " and conf has " + str(len(decoy_atoms)))
+>>>>>>> 85092edccbc979a0ee1ca9e92795000d11b4cb86
 		native_result, decoy_result = Parser.lcs(native_atoms, decoy_atoms)
 	else:
 		native_result = []
@@ -47,12 +51,20 @@ def main(argv):
 			if splt[0] == 'MODEL':
 				atoms = []
 				currConf = []
+<<<<<<< HEAD
 				alpha_carbons = 1
 			elif splt[0] == 'ATOM':
 				if(splt[2] == 'CA'):
 					if(len(decoy_result) == 0 or alpha_carbons in decoy_result):
 						atoms.append((float(splt[6]), float(splt[7]), float(splt[8])))
 					alpha_carbons += 1
+=======
+				nr_atoms = 0
+			elif splt[0] == 'ATOM':
+				nr_atoms += 1
+				if(splt[2] == 'CA' and (len(decoy_result) == 0 or nr_atoms in decoy_result)):
+					atoms.append((float(splt[6]), float(splt[7]), float(splt[8])))
+>>>>>>> 85092edccbc979a0ee1ca9e92795000d11b4cb86
 			elif splt[0] == 'TER':
 				if(len(atoms) > 0):
 					currConf.append(atoms)

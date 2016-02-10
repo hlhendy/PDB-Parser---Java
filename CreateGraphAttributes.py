@@ -9,9 +9,15 @@ import GraphAttributes
 #from matplotlib import pyplot as plt //In python 2.6.6 but not in python 3.3
 
 ##CONSTANTS
+<<<<<<< HEAD
 lRMSD_CRITERIA = 4 #produces more balanced pos/neg data points than 2 or 3
 RES_DISTANCE = 2 #Largest distance where all graphs are connected
 BIN_CRITERIA = 8 #In order to put an edge between nodes (u, v), the distance between them must be 8A or less
+=======
+lRMSD_CRITERIA = 3 #(between 2-4)
+RES_DISTANCE = 4
+BIN_CRITERIA = 8
+>>>>>>> 85092edccbc979a0ee1ca9e92795000d11b4cb86
 HPHOBIC = ['ALA', 'ILE', 'LEU', 'PHE', 'VAL', 'PRO', 'GLY']
 HPHILIC = ['ARG', 'LYS', 'ASP', 'GLU', 'GLN', 'ASN', 'HIS', 
 			'SER', 'THR', 'TYR', 'CYS', 'MET', 'TRP']
@@ -100,7 +106,11 @@ def main(argv):
 			graph = nx.Graph()
 			curr_conf = withinlRMSD[i]
 			for j in range(len(curr_conf)-RES_DISTANCE):
-				for k in range(j+RES_DISTANCE, len(curr_conf)):
+				if j + RES_DISTANCE < len(curr_conf):
+					k = j + RES_DISTANCE
+				else:
+					k = (j + RES_DISTANCE) - len(curr_conf)#wrap around??
+				#for k in range(j+RES_DISTANCE, len(curr_conf)):
 					atom1 = curr_conf[j]
 					atom2 = curr_conf[k]
 					#add nodes to graph with labels
@@ -150,6 +160,10 @@ def main(argv):
 						graph.node[j]['hydro'] = 'philic'
 					graph.add_node(k)
 					graph.node[k]['aminoAcid'] = labels[k]
+					if(labels[k] in HPHOBIC):
+						graph.node[k]['hydro'] = 'phobic'
+					else:
+						graph.node[k]['hydro'] = 'philic'
 					#find euclidean distance between atoms
 					d = Distance.euclideanDistance(atom1, atom2)
 					#if less than BIN_CRITERIA, add edge
