@@ -23,7 +23,7 @@ def countAtoms(file_in):
                 splt = line.split()
                 #parse lines
                 if splt[0] == 'ATOM':
-                        atom_chars.append(str(splt[2]))
+                        atom_chars.append(str(splt[2])) #TODO: change this to capture last columnn instead, for consistancy
                 elif splt[0] == 'TER': # or splt[0] == 'END' or splt[0] == 'ENDMDL':
                         if len(atom_chars) > 0:
                                 models +=1
@@ -101,7 +101,7 @@ def lcs(X , Y):
 	LCS = ""
 	i = m
 	j = n
-	while(i>0 and j >0):
+	while(i>0 and j>0):
 		if Counter(X[i-1]) == Counter(Y[j-1]):
 			LCS = X[i-1] + "-" + LCS
 			result_X.append(i)
@@ -149,6 +149,5 @@ def PDB(native_in, file_in, nr_models):
 	##############################################################################
 
 	
-
 
 
