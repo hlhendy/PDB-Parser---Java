@@ -9,15 +9,9 @@ import GraphAttributes
 #from matplotlib import pyplot as plt //In python 2.6.6 but not in python 3.3
 
 ##CONSTANTS
-<<<<<<< HEAD
 lRMSD_CRITERIA = 4 #produces more balanced pos/neg data points than 2 or 3
 RES_DISTANCE = 2 #Largest distance where all graphs are connected
 BIN_CRITERIA = 8 #In order to put an edge between nodes (u, v), the distance between them must be 8A or less
-=======
-lRMSD_CRITERIA = 3 #(between 2-4)
-RES_DISTANCE = 4
-BIN_CRITERIA = 8
->>>>>>> 85092edccbc979a0ee1ca9e92795000d11b4cb86
 HPHOBIC = ['ALA', 'ILE', 'LEU', 'PHE', 'VAL', 'PRO', 'GLY']
 HPHILIC = ['ARG', 'LYS', 'ASP', 'GLU', 'GLN', 'ASN', 'HIS', 
 			'SER', 'THR', 'TYR', 'CYS', 'MET', 'TRP']
@@ -75,22 +69,22 @@ def main(argv):
 	withinlRMSD, morethanlRMSD = Distance.sortBylRMSDs(nativeconformation, conformations, lRMSD_CRITERIA)
 	
 	#output image of native graph
-	nativeGraph = nx.Graph()
-	curr_conf = nativeconformation[0]
-	for j in range(len(curr_conf)-RES_DISTANCE):
-		for k in range(j+RES_DISTANCE, len(curr_conf)):
-			atom1 = curr_conf[j]
-			atom2 = curr_conf[k]
-			#add nodes to graph with labels
-			nativeGraph.add_node(j)
-			nativeGraph.node[j]['aminoAcid'] = labels[j]
-			nativeGraph.add_node(k)
-			nativeGraph.node[k]['aminoAcid'] = labels[k]
-			#find euclidean distance between atoms
-			d = Distance.euclideanDistance(atom1, atom2)
-			#if less than BIN_CRITERIA, add edge
-			if(d <= BIN_CRITERIA):
-				nativeGraph.add_edge(j, k, distance=d)
+	#nativeGraph = nx.Graph()
+	#curr_conf = nativeconformation[0]
+	#for j in range(len(curr_conf)-RES_DISTANCE):
+	#	for k in range(j+RES_DISTANCE, len(curr_conf)):
+	#		atom1 = curr_conf[j]
+	#		atom2 = curr_conf[k]
+	#		#add nodes to graph with labels
+	#		nativeGraph.add_node(j)
+	#		nativeGraph.node[j]['aminoAcid'] = labels[j]
+	#		nativeGraph.add_node(k)
+	#		nativeGraph.node[k]['aminoAcid'] = labels[k]
+	#		#find euclidean distance between atoms
+	#		d = Distance.euclideanDistance(atom1, atom2)
+	#		#if less than BIN_CRITERIA, add edge
+	#		if(d <= BIN_CRITERIA):
+	#			nativeGraph.add_edge(j, k, distance=d)
 	#printGraph(nativeGraph, 'Output/PosGraphs/native')
 	
 	#output graph attributes for each data set
@@ -106,11 +100,7 @@ def main(argv):
 			graph = nx.Graph()
 			curr_conf = withinlRMSD[i]
 			for j in range(len(curr_conf)-RES_DISTANCE):
-				if j + RES_DISTANCE < len(curr_conf):
-					k = j + RES_DISTANCE
-				else:
-					k = (j + RES_DISTANCE) - len(curr_conf)#wrap around??
-				#for k in range(j+RES_DISTANCE, len(curr_conf)):
+				for k in range(j+RES_DISTANCE, len(curr_conf)):
 					atom1 = curr_conf[j]
 					atom2 = curr_conf[k]
 					#add nodes to graph with labels
@@ -122,6 +112,10 @@ def main(argv):
 						graph.node[j]['hydro'] = 'philic'
 					graph.add_node(k)
 					graph.node[k]['aminoAcid'] = labels[k]
+					if(labels[j] in HPHOBIC):
+						graph.node[k]['hydro'] = 'phobic'
+					else:
+						graph.node[k]['hydro'] = 'philic'
 					#find euclidean distance between atoms
 					d = Distance.euclideanDistance(atom1, atom2)
 					#if less than BIN_CRITERIA, add edge
@@ -131,14 +125,14 @@ def main(argv):
 			#printGraph(graph, 'Output/PosGraphs/pos_'+str(i))
 			#################
 			#once graph is done, create attribute vector
-			#attributes = graphAttributes(graph)
+			attributes = graphAttributes(graph)
 			##FOR TESTING##
-			attributes = []
-			if(not nx.is_connected(graph)):
-				print("Graph " + i + "from within is not connected")
-				sys.exit(2)
-			else:
-				attributes.append(nx.is_connected(graph))
+			#attributes = []
+			#if(not nx.is_connected(graph)):
+			#	print("Graph " + i + "from within is not connected")
+			#	sys.exit(2)
+			#else:
+			#	attributes.append(nx.is_connected(graph))
 			#add 1 to the end since near native
 			attributes.append(1)
 			#and output to file as row
@@ -173,13 +167,13 @@ def main(argv):
 			#printGraph(graph, 'Output/NegGraphs/neg_'+str(i))
 			#################
 			#once graph is done, create attribute vector
-			#attributes = graphAttributes(graph)
-			##FOR TESTING##
-			if(not nx.is_connected(graph)):
-				print("Graph " + i + "from morethan is not connected")
-				sys.exit(2)
-			else:
-				attributes.append(nx.is_connected(graph))
+			attributes = graphAttributes(graph)
+			##FOR TESTING ONLY##
+			#if(not nx.is_connected(graph)):
+			#	print("Graph " + i + "from morethan is not connected")
+			#	sys.exit(2)
+			#else:
+			#	attributes.append(nx.is_connected(graph))
 			#add 0 to the end since decoy
 			attributes.append(0)
 			#and output to file as row

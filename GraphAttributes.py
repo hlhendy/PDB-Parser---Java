@@ -46,8 +46,8 @@ def eccentricityAttributes(graph):
 			eccVals.append(0)
 	eccSum = 0
 	center_nodes = 0
-	diameter = eccVals[max(eccVals)]
-	radius = eccVals[min(eccVals)]
+	diameter = max(eccVals)
+	radius = min(eccVals)
 	for i in range(len(eccVals)):
 		if eccVals[i] ==  radius:
 			center_nodes += 1
@@ -74,9 +74,13 @@ def eigenvalueAttributes(graph):
 	unique_values = []
 	for i in e:
 		eig_sum += (i*i)
-		if math.fabs(i) > largest:
+		if i < 0:
+			abs_i = i * -1
+		else:
+			abs_i = i
+		if abs_i > largest:
 			largest = i
-		elif math.fabs(i) > second_largest:
+		elif abs_i > second_largest:
 			second_largest = i
 		if i not in unique_values:
 			unique_values.append(i)

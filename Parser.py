@@ -13,29 +13,25 @@ START_TIME = 0
 ######################################################################
 ## read in atom names and return list of chars for each atom name
 ######################################################################
-def countAtoms(file_in):
+def countResidues(file_in):
         f_read = open(str(file_in), 'r')
-        atom_chars = []
+        res_names = []
         models = 0
         #read first model and store atom names only
         while models < 1:
                 line = f_read.readline()
                 splt = line.split()
                 #parse lines
-<<<<<<< HEAD
                 if splt[0] == 'ATOM' and splt[2] == 'CA': #changed to capture only CA atoms
-                        atom_chars.append(int(splt[5])) #Changed to capture residue number rather than atom name
-=======
-                if splt[0] == 'ATOM':
-                        atom_chars.append(str(splt[2])) #TODO: change this to capture last columnn instead, for consistancy
->>>>>>> 85092edccbc979a0ee1ca9e92795000d11b4cb86
+                        res_names.append((str(splt[3]), int(splt[5]))) #Changed to capture residue name/number rather than atom name
                 elif splt[0] == 'TER': # or splt[0] == 'END' or splt[0] == 'ENDMDL':
-                        if len(atom_chars) > 0:
+                        if len(res_names) > 0:
                                 models +=1
                         else:
                                 print("0 atoms at model ", models)
         f_read.close()
-        return atom_chars
+	print("Length is: " + str(len(res_names)))
+        return res_names
 
 ###################################################################
 ## read file with models and file with corresponding energies
@@ -60,7 +56,7 @@ def readConformations(file_in, nr_models, lcs):
 			alpha_carbons = 1
 		elif splt[0] == 'ATOM':
 			if(splt[2] == 'CA'):
-				if(len(lcs) == 0 or alpha_carbons in lcs):
+				if(len(lcs) == 0 or (str(splt[3]), int(splt[5])) in lcs):
 					#Store coords for atom
 					atoms.append((float(splt[6]), float(splt[7]), float(splt[8])))
 					#store amino acid names as labels
@@ -74,13 +70,13 @@ def readConformations(file_in, nr_models, lcs):
 				models +=1
 			else:
 				print("0 atoms at model ", models)
-			if models % 1000 == 0:
+			if models % 10000 == 0:
 				print("read model", models, "with ", len(atoms), "CA atoms")
 	return labels, conformations
 
-#accept native and decoy conformations
+#accepts list of CAs from native and first decoy (tuples with res name,number)
 #find longest common subsequence
-#return arrays of indices indicating locations of lcs elements in each array, a and b
+#return LCS with tuples names/number
 def lcs(X , Y):
     # find the length of the strings
 	m = len(X)
@@ -90,7 +86,7 @@ def lcs(X , Y):
 	dir = np.zeros((m+1, n+1))
 	for i in range(m+1):
 		for j in range(n+1):
-			if X[i-1] == Y[j-1]: #Removed Counter, just comparings ints now
+			if X[i-1][0] == Y[j-1][0]: #Removed Counter
 				C[i][j] = C[i-1][j-1]+1
 				dir[i][j] = 1 #diagonal
 			else:
@@ -108,17 +104,11 @@ def lcs(X , Y):
 	i = m
 	j = n
 	while(i>0 and j>0):
-<<<<<<< HEAD
-		if X[i-1] == Y[j-1]: #Removed Counter, just comparing ints now
+		if X[i-1][0] == Y[j-1][0]: #Removed Counter
 			LCS = str(X[i-1]) + "-" + LCS
+			#Return index of residue name
 			result_X.append(X[i-1])
 			result_Y.append(Y[j-1])
-=======
-		if Counter(X[i-1]) == Counter(Y[j-1]):
-			LCS = X[i-1] + "-" + LCS
-			result_X.append(i)
-			result_Y.append(j)
->>>>>>> 85092edccbc979a0ee1ca9e92795000d11b4cb86
 			i-= 1
 			j-= 1
 			length -= 1
@@ -135,8 +125,8 @@ def PDB(native_in, file_in, nr_models):
 	global START_TIME
 	START_TIME = time.time()
 	print("DETERMINING LENGTH OF ATOMS")
-	native_atoms = countAtoms(native_in)
-	decoy_atoms = countAtoms(file_in)
+	native_atoms = countResidues(native_in)
+	decoy_atoms = countResidues(file_in)
 	#determine longest common subsequence if needed
 	if len(native_atoms) != len(decoy_atoms):
 		print("Lengths are different: " + str(len(native_atoms)) + " " + str(len(decoy_atoms)))
@@ -144,7 +134,9 @@ def PDB(native_in, file_in, nr_models):
 		native_result, decoy_result = lcs(native_atoms, decoy_atoms)
 		print("Lengths are now: " + str(len(native_result)) + " " + str(len(decoy_result)))
 	else:
-                native_result, decoy_result = []
+                print("Lengths are the same: " + str(len(native_atoms)) + " " + str(len(decoy_atoms)))
+		native_result = []
+		decoy_result = []
 
 	#send readConformations array of indices from LCS if applicable, send empty list if not needed
 	#use this list to include only CAs that are in the LCS
@@ -162,5 +154,6 @@ def PDB(native_in, file_in, nr_models):
 	##############################################################################
 
 	
+
 
 
