@@ -29,8 +29,7 @@ def main(argv):
 	nativelabels, nativeconformation = Parser.readConformations(str(native_in), 1, native_result)
 	#Read decoys and store how many are within distance, morethan distance
 	#using criteria{2,4}
-	criteria = [2.00000000000,4.00000000000]
-	#f_read = open(str(file_in), 'r')
+	criteria = [2.0000000,4.0000000]
 	models = 0
 	atoms = []
 	output_data = []
@@ -57,53 +56,33 @@ def main(argv):
 					currConf.append(atoms)
 					models += 1
 					distance = Distance.lrmsd(nativeconformation[0], currConf[0])
-					output_data.append([distance])
-					#if distance <= criteria[0]:
-					#	within2 += 1
-					#	within4 += 1
-					#else:
-					#	morethan2 += 1
-					#	if distance <= criteria[1]:
-					#		within4 +=1 
-					#	else: 
-					#		morethan4 += 1
+					#output_data.append([distance])
+					if distance <= criteria[0]:
+						within2 += 1
+						within4 += 1
+					else:
+						morethan2 += 1
+						if distance <= criteria[1]:
+							within4 +=1 
+						else: 
+							morethan4 += 1
 		#Output results in table with protein name, lcs length, number within/morethan for each criteria
-		#output_data.append(native_in[5:-4])
-		#output_data.append(len(nativeconformation[0]))
-		#output_data.append(within2+morethan2)
-		#output_data.append(within2)
-		#output_data.append(morethan2)
-		#output_data.append(within4)
-		#output_data.append(morethan4)
+		output_data.append(native_in[5:-4])
+		output_data.append(len(nativeconformation[0]))
+		output_data.append(within2+morethan2)
+		output_data.append(within2)
+		output_data.append(morethan2)
+		output_data.append(within4)
+		output_data.append(morethan4)
 	with open(output_file, 'a+') as csvfile:
 		writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
-		#if(csvfile.readline() == ""):
-		#	writer.writerow(["Protein", "Num CA", "Num Confs", "Within 2", "Morethan 2", "Within 4", "Morethan 4"])
-		#writer.writerow(output_data)
-		for d in output_data:	
-			writer.writerow(d)
+		if(csvfile.readline() == ""):
+			writer.writerow(["Protein", "Num CA", "Num Confs", "Within 2", "Morethan 2", "Within 4", "Morethan 4"])
+		writer.writerow(output_data)
+		#for d in output_data:	
+		#	writer.writerow(d)
 	print("Completed")
 	
-#def main(argv):
-#	if len(argv) != 1:
-#		print("Please enter name of dat file")
-#		sys.exit(2)
-#	try:
-#		dat_file = argv[0]
-#	except:
-#		print("Please enter name of dat file")
-#		sys.exit(2)
-#	#Data file should include number of proteins as first line
-#	#Each line should contain <native file> <conf file> <number of models>
-#	output_file = 'Output/DatSetBreakdown.csv'
-#	with open(output_file, 'a') as csvfile:
-#		writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
-#		writer.writerow(['Protein Name', 'LCS', 'Within 2', 'Morethan 2', 'Within 4', 'Morethan 4'])
-#	#For each line, assign argument variables and send to dataSetBreakdown
-#	#while(next line):
-#		#line = line.next
-#		#native_in = split(line)[0] ... and so on
-#		dataSetBreakdown.breakdown(native_in, file_in, nr_models, output_file)
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
