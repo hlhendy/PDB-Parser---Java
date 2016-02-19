@@ -66,25 +66,31 @@ def eigenvalueAttributes(graph):
 	#Compute eigenvalues on L as ndarray object
 	#L = nx.normalized_laplacian_matrix(graph)
 	#e = numpy.linalg.eigvals(L.A)
-	e = nx.adjacency_spectrum(graph) #numPy array
+	#e = nx.adjacency_spectrum(graph) #numPy array
+	L = nx.normalized_laplacian_matrix(graph)
+	e = numpy.linalg.eigvals(L.A)
 	#energy: squared sum of eigenvalues
 	eig_sum = 0
 	largest = 0
 	second_largest = 0
 	unique_values = []
 	for i in e:
-		eig_sum += (i*i)
-		if i < 0:
-			abs_i = i * -1
-		else:
-			abs_i = i
-		if abs_i > largest:
-			largest = i
-		elif abs_i > second_largest:
-			second_largest = i
+		eig_sum += i
+		#if i < 0:
+		#	abs_i = i * -1
+		#else:
+		#	abs_i = i
+		#if abs_i > largest:
+		#	largest = i
+		#elif abs_i > second_largest:
+		#	second_largest = i
 		if i not in unique_values:
 			unique_values.append(i)
-	return_values.append(eig_sum)
+	return_values.append(eig_sum*eig_sum)
+	largest = max(e)
+	l_index = numpy.argmax(e)
+	e = numpy.delete(e, l_index)
+	second_largest = max(e)
 	#Second largest eigenvalue - http://docs.scipy.org/doc/numpy-1.10.1/reference/generated/numpy.linalg.eigvals.html
 	## -------> returns values with multiplicity and not in any order; not necessarily real for real matrices
 	return_values.append(second_largest)

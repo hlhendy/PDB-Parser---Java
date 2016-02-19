@@ -30,7 +30,7 @@ def countResidues(file_in):
                         else:
                                 print("0 atoms at model ", models)
         f_read.close()
-	print("Length is: " + str(len(res_names)))
+        print("Length is: " + str(len(res_names)))
         return res_names
 
 ###################################################################
@@ -134,10 +134,10 @@ def PDB(native_in, file_in, nr_models):
 		native_result, decoy_result = lcs(native_atoms, decoy_atoms)
 		print("Lengths are now: " + str(len(native_result)) + " " + str(len(decoy_result)))
 	else:
-                print("Lengths are the same: " + str(len(native_atoms)) + " " + str(len(decoy_atoms)))
+		print("Lengths are the same: " + str(len(native_atoms)) + " " + str(len(decoy_atoms)))
 		native_result = []
 		decoy_result = []
-
+        
 	#send readConformations array of indices from LCS if applicable, send empty list if not needed
 	#use this list to include only CAs that are in the LCS
 	print("READING INPUT FILES")
