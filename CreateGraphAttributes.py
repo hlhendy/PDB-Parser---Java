@@ -52,7 +52,7 @@ def printGraph(graph, filename):
 
 #######################################################################################
 def main(argv):
-	if len(argv) != 4:
+	if len(argv) != 5:
 		print('USAGE: <native pdb file> <pdb file> <model limit> <output file prefix> <lrmsd criteria>')
 		sys.exit(2)
 	try: #TODO: add better checking here
@@ -62,7 +62,7 @@ def main(argv):
 		output_prefix = str(argv[3])
 		lrmsd_criteria = int(argv[4])
 	except:
-		print('USAGE: <native pdb file> <pdb file> <model limit> <output file prefix>')
+		print('USAGE: <native pdb file> <pdb file> <model limit> <output file prefix> <lrmsd criteria>')
 		sys.exit(2)
 	#Create lists of conformations	
 	labels, nativeconformation, conformations = Parser.PDB(native_in, file_in, nr_models)
