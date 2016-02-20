@@ -94,7 +94,7 @@ def main(argv):
 		writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
 		writer.writerow(['num_edges', 'density','avg_degree','percent_endpoints','energy', 'second_eigen', 'unique_eigen', 'spectral_rad', 
 			'link_impurity', 'neighborhood_impurity', 'avg_closeness', 'avg_clustering', 'small_worldness','eccentricity','diameter',
-			'radius','%central_nodes', 'near_native'])
+			'radius','%central_nodes', '%Hydrophobic_center', 'near_native'])
 		#Positive Data Set
 		for i in range(len(withinlRMSD)):
 			graph = nx.Graph()

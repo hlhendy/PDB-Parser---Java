@@ -41,16 +41,19 @@ def eccentricityAttributes(graph):
 	e = 0
 	for n in graph.nodes():
 		try: 
-			eccVals.append(nx.eccentricity(graph, v=n))
+			eccVals.append(nx.eccentricity(graph, v=n))	
 		except nx.NetworkXError:
 			eccVals.append(0)
 	eccSum = 0
 	center_nodes = 0
+	phobic = 0
 	diameter = max(eccVals)
 	radius = min(eccVals)
 	for i in range(len(eccVals)):
 		if eccVals[i] ==  radius:
 			center_nodes += 1
+			if graph.node[i]['hydro'] == 'phobic':
+				phobic += 1
 		eccSum += eccVals[i]
 	return_values.append(eccSum / float(nx.number_of_nodes(graph)))	
 	#Effective diameter
@@ -59,6 +62,8 @@ def eccentricityAttributes(graph):
 	return_values.append(radius)
 	#Percentage central nodes
 	return_values.append(center_nodes / float(nx.number_of_nodes(graph)))
+	#Percentage central nodes that are hydrophobic
+	return_values.append(phobic / float(center_nodes))
 	return return_values
 
 def eigenvalueAttributes(graph):
@@ -75,11 +80,12 @@ def eigenvalueAttributes(graph):
 	second_largest = 0
 	unique_values = []
 	for i in e:
+		if i < 0:
+			abs_i = i * -1
+		else:
+			abs_i = i
+		#woods midterm paper - use squared sum of abs value
 		eig_sum += i
-		#if i < 0:
-		#	abs_i = i * -1
-		#else:
-		#	abs_i = i
 		#if abs_i > largest:
 		#	largest = i
 		#elif abs_i > second_largest:
