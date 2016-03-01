@@ -64,9 +64,9 @@ def eccentricityAttributes(graph):
 def eigenvalueAttributes(graph):
 	return_values = []
 	#Compute eigenvalues on L as ndarray object
-	#L = nx.normalized_laplacian_matrix(graph)
-	#e = numpy.linalg.eigvals(L.A)
-	e = nx.adjacency_spectrum(graph) #numPy array
+	L = nx.normalized_laplacian_matrix(graph) #numpy matrix
+	e = numpy.linalg.eigvals(L.A) #takes matrix and returns eigenvalues
+	#e = nx.adjacency_spectrum(graph) #numPy array
 	#energy: squared sum of eigenvalues
 	eig_sum = 0
 	largest = 0
