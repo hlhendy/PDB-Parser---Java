@@ -9,7 +9,7 @@ import GraphAttributes
 #from matplotlib import pyplot as plt //In python 2.6.6 but not in python 3.3
 
 ##CONSTANTS
-lRMSD_CRITERIA = 4 #produces more balanced pos/neg data points than 2 or 3
+#lRMSD_CRITERIA = 4 #produces more balanced pos/neg data points than 2
 RES_DISTANCE = 2 #Largest distance where all graphs are connected
 BIN_CRITERIA = 8 #In order to put an edge between nodes (u, v), the distance between them must be 8A or less
 HPHOBIC = ['ALA', 'ILE', 'LEU', 'PHE', 'VAL', 'PRO', 'GLY']
@@ -52,21 +52,22 @@ def printGraph(graph, filename):
 
 #######################################################################################
 def main(argv):
-	if len(argv) != 4:
-		print('USAGE: <native pdb file> <pdb file> <model limit> <output file prefix>')
+	if len(argv) != 5:
+		print('USAGE: <native pdb file> <pdb file> <model limit> <output file prefix> <lrmsd criteria>')
 		sys.exit(2)
 	try: #TODO: add better checking here
 		native_in = str(argv[0])
 		file_in = str(argv[1])
 		nr_models = int(argv[2])
 		output_prefix = str(argv[3])
+		lrmsd_criteria = int(argv[4])
 	except:
-		print('USAGE: <native pdb file> <pdb file> <model limit> <output file prefix>')
+		print('USAGE: <native pdb file> <pdb file> <model limit> <output file prefix> <lrmsd criteria>')
 		sys.exit(2)
 	#Create lists of conformations	
 	labels, nativeconformation, conformations = Parser.PDB(native_in, file_in, nr_models)
 	#Sort into positive and negative sets using lRMSD 
-	withinlRMSD, morethanlRMSD = Distance.sortBylRMSDs(nativeconformation, conformations, lRMSD_CRITERIA)
+	withinlRMSD, morethanlRMSD = Distance.sortBylRMSDs(nativeconformation, conformations, lrmsd_criteria)
 	
 	#output image of native graph
 	#nativeGraph = nx.Graph()
@@ -94,7 +95,7 @@ def main(argv):
 		writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
 		writer.writerow(['num_edges', 'density','avg_degree','percent_endpoints','energy', 'second_eigen', 'unique_eigen', 'spectral_rad', 
 			'link_impurity', 'neighborhood_impurity', 'avg_closeness', 'avg_clustering', 'small_worldness','eccentricity','diameter',
-			'radius','%central_nodes', 'near_native'])
+			'radius','%central_nodes', '%Hydrophobic_center', 'near_native'])
 		#Positive Data Set
 		for i in range(len(withinlRMSD)):
 			graph = nx.Graph()
