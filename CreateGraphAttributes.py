@@ -93,7 +93,7 @@ def main(argv):
 	dt = time.strftime("%Y%m%d-%H%M%S")
 	with open('Output/'+output_prefix+dt+'.csv', 'w') as csvfile:
 		writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
-		writer.writerow(['num_edges', 'density','avg_degree','percent_endpoints','energy', 'second_eigen', 'unique_eigen', 'spectral_rad', 
+		writer.writerow(['num_edges', 'density','avg_degree','percent_endpoints','energy', 'second_eigen', 'unique_eigen', 'spectral_rad', 'inverse_product',
 			'link_impurity', 'neighborhood_impurity', 'avg_closeness', 'avg_clustering', 'small_worldness','eccentricity','diameter',
 			'radius','%central_nodes', '%Hydrophobic_center', 'near_native'])
 		#Positive Data Set

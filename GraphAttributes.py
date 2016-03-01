@@ -77,6 +77,7 @@ def eigenvalueAttributes(graph):
 	largest = 0
 	second_largest = 0
 	unique_values = []
+	inverse_product =0
 	for i in e:
 		if i < 0:
 			abs_i = i * -1
@@ -84,6 +85,8 @@ def eigenvalueAttributes(graph):
 			abs_i = i
 		#woods midterm paper - use squared sum of abs value
 		eig_sum += i
+		#eigenvalue distriminants paper - use inverse of product of sqrt(eigval)
+		
 		#if abs_i > largest:
 		#	largest = i
 		#elif abs_i > second_largest:
@@ -102,6 +105,7 @@ def eigenvalueAttributes(graph):
 	return_values.append(len(unique_values))
 	#Spectral Radius: largest |eigenvalue|
 	return_values.append(largest)
+	return_values.append(inverse_product)
 	return return_values
 	
 	
