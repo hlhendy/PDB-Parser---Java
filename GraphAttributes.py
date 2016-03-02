@@ -74,6 +74,7 @@ def eigenvalueAttributes(graph):
 	#Compute eigenvalues on L as ndarray object
 	L = nx.normalized_laplacian_matrix(graph) #numpy matrix
 	e = numpy.linalg.eigvals(L.A) #takes matrix and returns eigenvalues
+	print(str(L))
 	#e = nx.adjacency_spectrum(graph) #numPy array
 	#energy: squared sum of eigenvalues
 	eig_sum = 0
@@ -104,7 +105,10 @@ def eigenvalueAttributes(graph):
 	#Spectral Radius: largest |eigenvalue|
 	return_values.append(largest)
 	#Inverse product [1/(sqrt|eig1| * sqrt|eig2| * ... * sqrt|eign|)]
-	return_values.append(1/float(inverse_product))
+	if(inverse_product > 0):
+		return_values.append(1/float(inverse_product))
+	else:
+		return_values.append(0)
 	return return_values
 	
 	
