@@ -1,7 +1,9 @@
+#Last updated: 10MARCH2016 by Heather Hendy
 import networkx as nx
 import numpy
 import math
 import operator
+import sys
 
 def shortest_path_lengths(graph):
 	n = nx.number_of_nodes(graph)
@@ -72,11 +74,10 @@ def eccentricityAttributes(graph):
 def eigenvalueAttributes(graph):
 	return_values = []
 	#Compute eigenvalues on L as ndarray object
-	L = nx.normalized_laplacian_matrix(graph) #numpy matrix
-	e = numpy.linalg.eigvals(L.A) #takes matrix and returns eigenvalues
-	print(str(L))
+	#L = nx.normalized_laplacian_matrix(graph) #numpy matrix
+	#e = numpy.linalg.eigvals(L.A) #takes matrix and returns eigenvalues
+	e = nx.laplacian_spectrum(graph) #numPy array; uses unnormalized laplcian matrix
 	#e = nx.adjacency_spectrum(graph) #numPy array
-	#energy: squared sum of eigenvalues
 	eig_sum = 0
 	largest = 0
 	second_largest = 0
@@ -93,20 +94,21 @@ def eigenvalueAttributes(graph):
 		inverse_product *= math.sqrt(abs_i) 
 		if i not in unique_values:
 			unique_values.append(i)
+	#energy: squared sum of eigenvalues
 	return_values.append(eig_sum*eig_sum)
-	largest = max(e) #largest actual value, not magnitude
+	largest = max(e) 
 	l_index = numpy.argmax(e)
 	e = numpy.delete(e, l_index)
-	second_largest = max(e) #second largest actual value, not magnitude
-	#Second largest eigenvalue
+	#Second largest eigenvalue (actual value, not magnitude)
+	second_largest = max(e)
 	return_values.append(second_largest)
 	#Number distict eigenvalues
 	return_values.append(len(unique_values))
-	#Spectral Radius: largest |eigenvalue|
+	#Spectral Radius: largest eigenvalue (actual value, not magnitude)
 	return_values.append(largest)
 	#Inverse product [1/(sqrt|eig1| * sqrt|eig2| * ... * sqrt|eign|)]
 	if(inverse_product > 0):
-		return_values.append(1/float(inverse_product))
+		return_values.append(1/inverse_product)
 	else:
 		return_values.append(0)
 	return return_values
@@ -131,7 +133,7 @@ def labelAttributes(graph):
 		for nn in neighborhood:
 			if graph.node[cn]['hydro'] != graph.node[nn]['hydro']:
 				deg += 1
-	return_values.append(deg/num_nodes)		
+	return_values.append(float(deg)/num_nodes)		
 	return return_values
 	
 def clusterAttributes(graph):
@@ -156,9 +158,10 @@ def smallWorldness(graph):
 	n = len(nx.nodes(graph))
 	e = len(nx.edges(graph))
 	#probability of edges: (number of edges in real graph)/possible edges
-	p = e/float((n*(n-1)/2.0))
+	p = e/float((n*(n-1)/2.0))	
+	##
 	#generate random graph using probability
-	rand_graph = nx.fast_gnp_random_graph(n, p)
+	rand_graph = nx.fast_gnp_random_graph(n, p, seed=1)
 	#calculate values for real graph and random graph
 	Creal = nx.transitivity(graph) #float
 	Crand = nx.transitivity(rand_graph) #float

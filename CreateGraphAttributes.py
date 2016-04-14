@@ -1,3 +1,4 @@
+#Last Updated: 10MARCH2016 by Heather Hendy
 import networkx as nx
 import csv
 import sys
@@ -90,7 +91,7 @@ def main(argv):
 	
 	#output graph attributes for each data set
 	#Note: removed newline='' from open() for linux
-	dt = time.strftime("%Y%m%d-%H%M%S")
+	dt = time.strftime("_%Y%m%d-%H%M%S")
 	with open('Output/'+output_prefix+dt+'.csv', 'w') as csvfile:
 		writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
 		writer.writerow(['num_edges', 'density','avg_degree','percent_endpoints','energy', 'second_eigen', 'unique_eigen', 'spectral_rad', 'inverse_product',
@@ -113,7 +114,7 @@ def main(argv):
 						graph.node[j]['hydro'] = 'philic'
 					graph.add_node(k)
 					graph.node[k]['aminoAcid'] = labels[k]
-					if(labels[j] in HPHOBIC):
+					if(labels[k] in HPHOBIC):
 						graph.node[k]['hydro'] = 'phobic'
 					else:
 						graph.node[k]['hydro'] = 'philic'

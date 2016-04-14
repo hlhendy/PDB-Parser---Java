@@ -3,6 +3,7 @@
 ##		- PDB(String filename): reads PDB file and outputs lists of
 ##			atoms (tuples that include atom name, amino acid name, 
 ##			coords)
+##		- CSVtoARFF
 ######################################################################
 import time
 import numpy as np
@@ -153,7 +154,47 @@ def PDB(native_in, file_in, nr_models):
 	return labels, nativeconformation, conformations;
 	##############################################################################
 
-	
-
+def CSVtoARFF(inDir, csvfile, outDir):
+	arffFile = outDir+'/'+csvfile[0:-4] + '.arff'
+	relation = csvfile[0:-4]
+	datetime = time.strftime("%m/%d/%Y @%H:%M:%S")
+	filename = inDir+"/"+csvfile
+	with open(arffFile, 'w') as af:
+		#Write Header
+		af.write("% 1. Title: Graph Attributes for " + relation)
+		af.write("\n")
+		af.write("% 2. Created: " + datetime)
+		af.write("\n")
+		af.write("@RELATION " + relation)
+		af.write("\n")
+		#Write Attributes/Features
+		with open(filename, 'r') as csv:
+			colnames = csv.readline().split(',')
+			for col in colnames:
+				col = col.rstrip()
+				if col[0] == '%':
+					col = col[1:]
+				if col == 'near_native':
+					af.write("@ATTRIBUTE class {0,1}")
+				else:
+					af.write("@ATTRIBUTE " + col + " NUMERIC")
+				af.write("\n")
+			#Write Data
+			af.write("@DATA\n")
+			#for each row in csvfile, write row to arff file
+			for line in csv:
+				new_line = ''
+				strp = line.split(',')
+				if strp[len(strp)-1].rstrip() == '1.0':
+					strp[len(strp)-1] = '1'
+				elif strp[len(strp)-1].rstrip() == '0.0':
+					strp[len(strp)-1] = '0'
+				for elem in strp:
+					new_line += (elem + ',')
+				new_line = new_line[:-1]
+				new_line += "\n"
+				af.write(new_line)
+		csv.closed
+	af.closed
 
 
